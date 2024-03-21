@@ -75,6 +75,8 @@ public class WorkSessionActivity extends AppCompatActivity
                 }
 
                 runOnUiThread(() -> workSessionResponse.setText(responseBody));
+
+                response.close();
             }
         });
     }
@@ -115,6 +117,8 @@ public class WorkSessionActivity extends AppCompatActivity
                 }
 
                 runOnUiThread(() -> workSessionResponse.setText(responseBody));
+
+                response.close();
             }
         });
     }
