@@ -41,6 +41,51 @@ public class LoginActivity extends AppCompatActivity
         submitButton = findViewById(R.id.login_submit_btn);
 
         submitButton.setOnClickListener(this::submitOnClickListener);
+
+        validateTokenAndSwitchActivity();
+    }
+
+    private void validateTokenAndSwitchActivity()
+    {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        String jwt = sharedPreferences.getString("Auth", null);
+
+        if (jwt != null)
+        {
+            Request request = new Request.Builder()
+                    .url("http://192.168.0.100:8080/api/auth/validate")
+                    .get()
+                    .addHeader("Auth", jwt)
+                    .build();
+            Call call = okHttpClient.newCall(request);
+
+            call.enqueue(new Callback()
+            {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e)
+                {
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+                {
+                    if (response.isSuccessful())
+                    {
+                        runOnUiThread(() ->
+                        {
+                            Intent intent = new Intent(LoginActivity.this, WorkSessionActivity.class);
+
+                            startActivity(intent);
+                            finish();
+                        });
+                    }
+
+                    response.close();
+                }
+            });
+        }
     }
 
     private void submitOnClickListener(View view)
@@ -75,6 +120,7 @@ public class LoginActivity extends AppCompatActivity
                     SharedPreferences.Editor editor = sharedPreferences.edit();
 
                     editor.putString("Auth", jwt);
+                    editor.apply();
 
                     runOnUiThread(() ->
                     {
