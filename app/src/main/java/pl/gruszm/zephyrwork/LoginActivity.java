@@ -3,6 +3,7 @@ package pl.gruszm.zephyrwork;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -70,11 +71,18 @@ public class LoginActivity extends AppCompatActivity
                 if (response.isSuccessful())
                 {
                     String jwt = response.body().string();
-
                     SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
 
                     editor.putString("Auth", jwt);
+
+                    runOnUiThread(() ->
+                    {
+                        Intent intent = new Intent(LoginActivity.this, WorkSessionActivity.class);
+
+                        startActivity(intent);
+                        finish();
+                    });
                 }
                 else
                 {
