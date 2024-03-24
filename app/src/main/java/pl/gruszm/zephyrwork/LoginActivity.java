@@ -27,6 +27,7 @@ import pl.gruszm.zephyrwork.config.AppConfig;
 
 public class LoginActivity extends AppCompatActivity
 {
+    private boolean callLock;
     private EditText email, password;
     private Button submitButton;
 
@@ -35,6 +36,8 @@ public class LoginActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        callLock = false;
 
         email = findViewById(R.id.email_edit_text);
         password = findViewById(R.id.password_edit_text);
@@ -90,6 +93,11 @@ public class LoginActivity extends AppCompatActivity
 
     private void submitOnClickListener(View view)
     {
+        if (callLock == true)
+        {
+            return;
+        }
+
         OkHttpClient okHttpClient = new OkHttpClient();
         Gson gson = new Gson();
         MediaType mediaTypeJson = MediaType.get("application/json");
@@ -101,6 +109,7 @@ public class LoginActivity extends AppCompatActivity
                 .post(requestBody)
                 .build();
         Call call = okHttpClient.newCall(request);
+        callLock = true;
 
         call.enqueue(new Callback()
         {
@@ -108,6 +117,8 @@ public class LoginActivity extends AppCompatActivity
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
                 runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+
+                callLock = false;
             }
 
             @Override
@@ -134,6 +145,8 @@ public class LoginActivity extends AppCompatActivity
                 {
                     runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Invalid email or password. Please try again.", Toast.LENGTH_SHORT).show());
                 }
+
+                callLock = false;
 
                 response.close();
             }
