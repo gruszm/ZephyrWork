@@ -23,6 +23,7 @@ import pl.gruszm.zephyrwork.config.AppConfig;
 
 public class WorkSessionActivity extends AppCompatActivity
 {
+    private boolean callLock;
     private Button startWorkSessionBtn, finishWorkSessionBtn;
     private TextView workSessionResponse;
 
@@ -31,6 +32,8 @@ public class WorkSessionActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.work_session);
+
+        callLock = false;
 
         startWorkSessionBtn = findViewById(R.id.start_work_session_btn);
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
@@ -42,6 +45,11 @@ public class WorkSessionActivity extends AppCompatActivity
 
     private void startWorkSessionOnClickListener(View view)
     {
+        if (callLock == true)
+        {
+            return;
+        }
+
         OkHttpClient okHttpClient = new OkHttpClient();
         SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         String jwt = sharedPreferences.getString("Auth", "");
@@ -53,6 +61,7 @@ public class WorkSessionActivity extends AppCompatActivity
                 .build();
 
         Call call = okHttpClient.newCall(request);
+        callLock = true;
 
         call.enqueue(new Callback()
         {
@@ -60,6 +69,8 @@ public class WorkSessionActivity extends AppCompatActivity
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
                 runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+
+                callLock = false;
             }
 
             @Override
@@ -87,6 +98,8 @@ public class WorkSessionActivity extends AppCompatActivity
                     runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "You already have an active Work Session at the moment.", Toast.LENGTH_SHORT).show());
                 }
 
+                callLock = false;
+
                 response.close();
             }
         });
@@ -94,6 +107,11 @@ public class WorkSessionActivity extends AppCompatActivity
 
     private void finishWorkSessionOnClickListener(View view)
     {
+        if (callLock == true)
+        {
+            return;
+        }
+
         OkHttpClient okHttpClient = new OkHttpClient();
         SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         String jwt = sharedPreferences.getString("Auth", "");
@@ -105,6 +123,7 @@ public class WorkSessionActivity extends AppCompatActivity
                 .build();
 
         Call call = okHttpClient.newCall(request);
+        callLock = true;
 
         call.enqueue(new Callback()
         {
@@ -112,6 +131,8 @@ public class WorkSessionActivity extends AppCompatActivity
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
                 runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+
+                callLock = false;
             }
 
             @Override
@@ -138,6 +159,8 @@ public class WorkSessionActivity extends AppCompatActivity
                 {
                     runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "You do not have an active Work Session at the moment.", Toast.LENGTH_SHORT).show());
                 }
+
+                callLock = false;
 
                 response.close();
             }
