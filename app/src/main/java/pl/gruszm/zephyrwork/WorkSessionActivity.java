@@ -1,8 +1,11 @@
 package pl.gruszm.zephyrwork;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -11,7 +14,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -24,8 +34,8 @@ import pl.gruszm.zephyrwork.config.AppConfig;
 public class WorkSessionActivity extends AppCompatActivity
 {
     private boolean callLock;
-    private Button startWorkSessionBtn, finishWorkSessionBtn;
-    private TextView workSessionResponse;
+    private Button startWorkSessionBtn, finishWorkSessionBtn, readCurrentLocationBtn;
+    private TextView workSessionResponse, currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -37,10 +47,13 @@ public class WorkSessionActivity extends AppCompatActivity
 
         startWorkSessionBtn = findViewById(R.id.start_work_session_btn);
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
+        readCurrentLocationBtn = findViewById(R.id.read_current_location_btn);
         workSessionResponse = findViewById(R.id.work_session_response);
+        currentLocation = findViewById(R.id.current_location);
 
         startWorkSessionBtn.setOnClickListener(this::startWorkSessionOnClickListener);
         finishWorkSessionBtn.setOnClickListener(this::finishWorkSessionOnClickListener);
+        readCurrentLocationBtn.setOnClickListener(this::readCurrentLocationOnClickListener);
     }
 
     private void startWorkSessionOnClickListener(View view)
@@ -165,5 +178,28 @@ public class WorkSessionActivity extends AppCompatActivity
                 response.close();
             }
         });
+    }
+
+    private void readCurrentLocationOnClickListener(View view)
+    {
+        // Check permissions for location
+        if ((checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED)
+                && (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED))
+        {
+            requestPermissions(Arrays.asList(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION).toArray(new String[0]), AppConfig.LOCATION_CODE);
+
+            return;
+        }
+
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        fusedLocationProviderClient.requestLocationUpdates(
+                new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).setMaxUpdates(1).build(),
+                location ->
+                {
+                    currentLocation.setText(String.format(Locale.ENGLISH, "Latitude: %f\nLongitude: %f", location.getLatitude(), location.getLongitude()));
+                },
+                Looper.getMainLooper()
+        );
     }
 }
