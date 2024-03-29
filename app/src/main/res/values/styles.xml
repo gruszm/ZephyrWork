@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="UserDataStylePrimary">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">30dp</item>
+    </style>
+
+    <style name="UserDataStyleSecondary">
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="layout_constraintRight_toRightOf">parent</item>
+        <item name="android:layout_marginRight">50dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+    </style>
+</resources>
