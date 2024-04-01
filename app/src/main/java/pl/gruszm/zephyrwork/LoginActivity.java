@@ -52,43 +52,41 @@ public class LoginActivity extends AppCompatActivity
     {
         OkHttpClient okHttpClient = new OkHttpClient();
         SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-        String jwt = sharedPreferences.getString("Auth", null);
+        String jwt = sharedPreferences.getString("Auth", "");
 
-        if (jwt != null)
+        Request request = new Request.Builder()
+                .url("http://192.168.0.100:8080/api/auth/validate")
+                .get()
+                .header("Auth", jwt)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+
+        call.enqueue(new Callback()
         {
-            Request request = new Request.Builder()
-                    .url("http://192.168.0.100:8080/api/auth/validate")
-                    .get()
-                    .addHeader("Auth", jwt)
-                    .build();
-            Call call = okHttpClient.newCall(request);
-
-            call.enqueue(new Callback()
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e)
-                {
-                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
-                }
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+            }
 
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+            {
+                if (response.isSuccessful())
                 {
-                    if (response.isSuccessful())
+                    runOnUiThread(() ->
                     {
-                        runOnUiThread(() ->
-                        {
-                            Intent intent = new Intent(LoginActivity.this, WorkSessionActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, WorkSessionActivity.class);
 
-                            startActivity(intent);
-                            finish();
-                        });
-                    }
+                        startActivity(intent);
+                        finish();
+                    });
 
                     response.close();
                 }
-            });
-        }
+            }
+        });
     }
 
     private void submitOnClickListener(View view)
@@ -104,10 +102,12 @@ public class LoginActivity extends AppCompatActivity
         LoginRequest loginRequest = new LoginRequest(email.getText().toString(), password.getText().toString());
         String loginRequestJson = gson.toJson(loginRequest);
         RequestBody requestBody = RequestBody.create(loginRequestJson, mediaTypeJson);
+
         Request request = new Request.Builder()
                 .url("http://192.168.0.100:8080/api/auth/login")
                 .post(requestBody)
                 .build();
+
         Call call = okHttpClient.newCall(request);
         callLock = true;
 

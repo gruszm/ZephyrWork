@@ -63,4 +63,12 @@
         android:layout_marginHorizontal="30dp"
         android:textSize="20sp" />
 
+    <Button
+        android:id="@+id/user_profile_btn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:backgroundTint="#00AA00" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

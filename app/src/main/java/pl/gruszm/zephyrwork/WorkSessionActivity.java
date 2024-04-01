@@ -34,26 +34,28 @@ import pl.gruszm.zephyrwork.config.AppConfig;
 public class WorkSessionActivity extends AppCompatActivity
 {
     private boolean callLock;
-    private Button startWorkSessionBtn, finishWorkSessionBtn, readCurrentLocationBtn;
+    private Button startWorkSessionBtn, finishWorkSessionBtn, readCurrentLocationBtn, userProfileBtn;
     private TextView workSessionResponse, currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.work_session);
+        setContentView(R.layout.activity_work_session);
 
         callLock = false;
 
         startWorkSessionBtn = findViewById(R.id.start_work_session_btn);
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
         readCurrentLocationBtn = findViewById(R.id.read_current_location_btn);
+        userProfileBtn = findViewById(R.id.user_profile_btn);
         workSessionResponse = findViewById(R.id.work_session_response);
         currentLocation = findViewById(R.id.current_location);
 
         startWorkSessionBtn.setOnClickListener(this::startWorkSessionOnClickListener);
         finishWorkSessionBtn.setOnClickListener(this::finishWorkSessionOnClickListener);
         readCurrentLocationBtn.setOnClickListener(this::readCurrentLocationOnClickListener);
+        userProfileBtn.setOnClickListener(this::userProfileOnClickListener);
     }
 
     private void startWorkSessionOnClickListener(View view)
@@ -201,5 +203,12 @@ public class WorkSessionActivity extends AppCompatActivity
                 },
                 Looper.getMainLooper()
         );
+    }
+
+    private void userProfileOnClickListener(View view)
+    {
+        Intent intent = new Intent(this, UserProfileActivity.class);
+
+        startActivity(intent);
     }
 }
