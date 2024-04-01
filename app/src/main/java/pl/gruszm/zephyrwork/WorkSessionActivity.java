@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
@@ -33,12 +34,12 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import pl.gruszm.zephyrwork.config.AppConfig;
 
-public class WorkSessionActivity extends AppCompatActivity
+public class WorkSessionActivity extends AppCompatActivity implements LocationListener
 {
     private static final int REGISTER_LOCATION_DELAY_MS = 2000;
-
+    private FusedLocationProviderClient fusedLocationProviderClient;
     private boolean callLock;
-    private Button startWorkSessionBtn, finishWorkSessionBtn, readCurrentLocationBtn, userProfileBtn;
+    private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn;
     private TextView workSessionResponse, currentLocation;
     private Location location;
 
@@ -48,11 +49,11 @@ public class WorkSessionActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_work_session);
 
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         callLock = false;
 
         startWorkSessionBtn = findViewById(R.id.start_work_session_btn);
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
-        readCurrentLocationBtn = findViewById(R.id.read_current_location_btn);
         userProfileBtn = findViewById(R.id.user_profile_btn);
         workSessionResponse = findViewById(R.id.work_session_response);
         currentLocation = findViewById(R.id.current_location);
@@ -111,19 +112,20 @@ public class WorkSessionActivity extends AppCompatActivity
                 if (response.isSuccessful())
                 {
                     String responseBody = response.body().string();
-                    FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(WorkSessionActivity.this);
 
-                    runOnUiThread(() -> workSessionResponse.setText(responseBody));
+                    runOnUiThread(() ->
+                    {
+                        workSessionResponse.setText(responseBody);
+                    });
 
-                    fusedLocationProviderClient.requestLocationUpdates(
+                    // Start registering the location
+                    WorkSessionActivity.this.fusedLocationProviderClient.requestLocationUpdates(
                             new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, REGISTER_LOCATION_DELAY_MS).build(),
-                            location ->
-                            {
-                                WorkSessionActivity.this.location = location;
-                                System.out.println(String.format(Locale.ENGLISH, "Latitude: %f, Longitude: %f", WorkSessionActivity.this.location.getLatitude(), WorkSessionActivity.this.location.getLongitude()));
-                            },
+                            WorkSessionActivity.this,
                             Looper.getMainLooper()
                     );
+
+                    response.close();
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
@@ -141,8 +143,6 @@ public class WorkSessionActivity extends AppCompatActivity
                 }
 
                 callLock = false;
-
-                response.close();
             }
         });
     }
@@ -185,7 +185,15 @@ public class WorkSessionActivity extends AppCompatActivity
                 if (response.isSuccessful())
                 {
                     String responseBody = response.body().string();
-                    runOnUiThread(() -> workSessionResponse.setText(responseBody));
+
+                    runOnUiThread(() ->
+                    {
+                        workSessionResponse.setText(responseBody);
+                    });
+
+                    fusedLocationProviderClient.removeLocationUpdates(WorkSessionActivity.this);
+
+                    response.close();
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
@@ -203,10 +211,19 @@ public class WorkSessionActivity extends AppCompatActivity
                 }
 
                 callLock = false;
-
-                response.close();
             }
         });
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location)
+    {
+        this.location = location;
+        String locationFormatted = String.format(Locale.ENGLISH, "Latitude: %f\nLongitude: %f", this.location.getLatitude(), this.location.getLongitude());
+
+        System.out.println(locationFormatted);
+
+        currentLocation.setText(locationFormatted);
     }
 
     private void userProfileOnClickListener(View view)
