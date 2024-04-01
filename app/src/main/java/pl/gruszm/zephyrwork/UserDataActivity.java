@@ -26,7 +26,7 @@ public class UserDataActivity extends AppCompatActivity
     private OkHttpClient okHttpClient;
     private Gson gson;
     private SharedPreferences sharedPreferences;
-    private TextView firstName, lastName, email, supervisorFirstName, supervisorLastName, supervisorEmail;
+    private TextView firstName, lastName, email, roles, supervisorFirstName, supervisorLastName, supervisorEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -41,6 +41,7 @@ public class UserDataActivity extends AppCompatActivity
         firstName = findViewById(R.id.user_data_first_name_edit);
         lastName = findViewById(R.id.user_data_last_name_edit);
         email = findViewById(R.id.user_data_email_edit);
+        roles = findViewById(R.id.user_data_roles_edit);
         supervisorFirstName = findViewById(R.id.user_data_supervisor_first_name_edit);
         supervisorLastName = findViewById(R.id.user_data_supervisor_last_name_edit);
         supervisorEmail = findViewById(R.id.user_data_supervisor_email_edit);
@@ -82,6 +83,7 @@ public class UserDataActivity extends AppCompatActivity
                         firstName.setText(userDTO.getFirstName());
                         lastName.setText(userDTO.getLastName());
                         email.setText(userDTO.getEmail());
+                        roles.setText(String.join(", ", userDTO.getRoles()));
                     });
 
                     retrieveSupervisorData();
