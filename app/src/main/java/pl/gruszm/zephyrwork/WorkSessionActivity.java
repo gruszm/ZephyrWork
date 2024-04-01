@@ -41,7 +41,7 @@ public class WorkSessionActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.work_session);
+        setContentView(R.layout.activity_work_session);
 
         callLock = false;
 
