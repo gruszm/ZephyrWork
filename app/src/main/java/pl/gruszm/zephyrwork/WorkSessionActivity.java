@@ -1,9 +1,11 @@
 package pl.gruszm.zephyrwork;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
@@ -33,9 +35,12 @@ import pl.gruszm.zephyrwork.config.AppConfig;
 
 public class WorkSessionActivity extends AppCompatActivity
 {
+    private static final int REGISTER_LOCATION_DELAY_MS = 2000;
+
     private boolean callLock;
     private Button startWorkSessionBtn, finishWorkSessionBtn, readCurrentLocationBtn, userProfileBtn;
     private TextView workSessionResponse, currentLocation;
+    private Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -54,12 +59,20 @@ public class WorkSessionActivity extends AppCompatActivity
 
         startWorkSessionBtn.setOnClickListener(this::startWorkSessionOnClickListener);
         finishWorkSessionBtn.setOnClickListener(this::finishWorkSessionOnClickListener);
-        readCurrentLocationBtn.setOnClickListener(this::readCurrentLocationOnClickListener);
         userProfileBtn.setOnClickListener(this::userProfileOnClickListener);
     }
 
     private void startWorkSessionOnClickListener(View view)
     {
+        // Check permissions for location
+        if ((checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED)
+                && (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED))
+        {
+            requestPermissions(Arrays.asList(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION).toArray(new String[0]), AppConfig.LOCATION_CODE);
+
+            return;
+        }
+
         if (callLock == true)
         {
             return;
@@ -88,6 +101,8 @@ public class WorkSessionActivity extends AppCompatActivity
                 callLock = false;
             }
 
+            // Suppressed, because permission is checked at the beginning of the function
+            @SuppressLint("MissingPermission")
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
             {
@@ -96,7 +111,19 @@ public class WorkSessionActivity extends AppCompatActivity
                 if (response.isSuccessful())
                 {
                     String responseBody = response.body().string();
+                    FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(WorkSessionActivity.this);
+
                     runOnUiThread(() -> workSessionResponse.setText(responseBody));
+
+                    fusedLocationProviderClient.requestLocationUpdates(
+                            new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, REGISTER_LOCATION_DELAY_MS).build(),
+                            location ->
+                            {
+                                WorkSessionActivity.this.location = location;
+                                System.out.println(String.format(Locale.ENGLISH, "Latitude: %f, Longitude: %f", WorkSessionActivity.this.location.getLatitude(), WorkSessionActivity.this.location.getLongitude()));
+                            },
+                            Looper.getMainLooper()
+                    );
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
@@ -180,29 +207,6 @@ public class WorkSessionActivity extends AppCompatActivity
                 response.close();
             }
         });
-    }
-
-    private void readCurrentLocationOnClickListener(View view)
-    {
-        // Check permissions for location
-        if ((checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED)
-                && (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED))
-        {
-            requestPermissions(Arrays.asList(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION).toArray(new String[0]), AppConfig.LOCATION_CODE);
-
-            return;
-        }
-
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        fusedLocationProviderClient.requestLocationUpdates(
-                new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 0).setMaxUpdates(1).build(),
-                location ->
-                {
-                    currentLocation.setText(String.format(Locale.ENGLISH, "Latitude: %f\nLongitude: %f", location.getLatitude(), location.getLongitude()));
-                },
-                Looper.getMainLooper()
-        );
     }
 
     private void userProfileOnClickListener(View view)
