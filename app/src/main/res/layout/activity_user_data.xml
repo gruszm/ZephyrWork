@@ -48,10 +48,23 @@
         style="@style/UserDataStyleSecondary" />
 
     <TextView
-        android:id="@+id/user_data_supervisor_first_name"
-        android:text="Supervisor's first name:"
+        android:id="@+id/user_data_roles"
+        android:text="Roles:"
         app:layout_constraintLeft_toLeftOf="@id/user_data_email_edit"
         app:layout_constraintTop_toBottomOf="@id/user_data_email_edit"
+        style="@style/UserDataStylePrimary" />
+
+    <TextView
+        android:id="@+id/user_data_roles_edit"
+        app:layout_constraintLeft_toLeftOf="@id/user_data_roles"
+        app:layout_constraintTop_toBottomOf="@id/user_data_roles"
+        style="@style/UserDataStyleSecondary" />
+
+    <TextView
+        android:id="@+id/user_data_supervisor_first_name"
+        android:text="Supervisor's first name:"
+        app:layout_constraintLeft_toLeftOf="@id/user_data_roles_edit"
+        app:layout_constraintTop_toBottomOf="@id/user_data_roles_edit"
         style="@style/UserDataStylePrimary" />
 
     <TextView
