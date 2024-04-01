@@ -21,7 +21,7 @@ import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.config.AppConfig;
 
-public class UserDataActivity extends AppCompatActivity
+public class UserProfileActivity extends AppCompatActivity
 {
     private OkHttpClient okHttpClient;
     private Gson gson;
@@ -32,19 +32,19 @@ public class UserDataActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_data);
+        setContentView(R.layout.activity_user_profile);
 
         okHttpClient = new OkHttpClient();
         gson = new Gson();
         sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 
-        firstName = findViewById(R.id.user_data_first_name_edit);
-        lastName = findViewById(R.id.user_data_last_name_edit);
-        email = findViewById(R.id.user_data_email_edit);
-        roles = findViewById(R.id.user_data_roles_edit);
-        supervisorFirstName = findViewById(R.id.user_data_supervisor_first_name_edit);
-        supervisorLastName = findViewById(R.id.user_data_supervisor_last_name_edit);
-        supervisorEmail = findViewById(R.id.user_data_supervisor_email_edit);
+        firstName = findViewById(R.id.user_profile_first_name_edit);
+        lastName = findViewById(R.id.user_profile_last_name_edit);
+        email = findViewById(R.id.user_profile_email_edit);
+        roles = findViewById(R.id.user_profile_roles_edit);
+        supervisorFirstName = findViewById(R.id.user_profile_supervisor_first_name_edit);
+        supervisorLastName = findViewById(R.id.user_profile_supervisor_last_name_edit);
+        supervisorEmail = findViewById(R.id.user_profile_supervisor_email_edit);
 
         retrieveUserData();
     }
@@ -65,7 +65,7 @@ public class UserDataActivity extends AppCompatActivity
             {
                 runOnUiThread(() ->
                 {
-                    Toast.makeText(UserDataActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserProfileActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
 
                     finish();
                 });
@@ -74,7 +74,7 @@ public class UserDataActivity extends AppCompatActivity
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
             {
-                if (response.code() == 200)
+                if (response.isSuccessful())
                 {
                     UserDTO userDTO = gson.fromJson(response.body().string(), UserDTO.class);
 
@@ -94,10 +94,10 @@ public class UserDataActivity extends AppCompatActivity
                 {
                     runOnUiThread(() ->
                     {
-                        Intent intent = new Intent(UserDataActivity.this, LoginActivity.class);
+                        Intent intent = new Intent(UserProfileActivity.this, LoginActivity.class);
 
                         // Show error message and redirect to Login activity
-                        Toast.makeText(UserDataActivity.this, "Authorization error. Please log in and try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UserProfileActivity.this, "Authorization error. Please log in and try again.", Toast.LENGTH_SHORT).show();
                         startActivity(intent);
                         finish();
                     });
@@ -122,7 +122,7 @@ public class UserDataActivity extends AppCompatActivity
             {
                 runOnUiThread(() ->
                 {
-                    Toast.makeText(UserDataActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserProfileActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
 
                     finish();
                 });
@@ -131,7 +131,7 @@ public class UserDataActivity extends AppCompatActivity
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
             {
-                if (response.code() == 200)
+                if (response.isSuccessful())
                 {
                     UserDTO supervisorDto = gson.fromJson(response.body().string(), UserDTO.class);
 
@@ -148,10 +148,10 @@ public class UserDataActivity extends AppCompatActivity
                 {
                     runOnUiThread(() ->
                     {
-                        Intent intent = new Intent(UserDataActivity.this, LoginActivity.class);
+                        Intent intent = new Intent(UserProfileActivity.this, LoginActivity.class);
 
                         // Show error message and redirect to Login activity
-                        Toast.makeText(UserDataActivity.this, "Authorization error. Please log in and try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UserProfileActivity.this, "Authorization error. Please log in and try again.", Toast.LENGTH_SHORT).show();
                         startActivity(intent);
                         finish();
                     });

@@ -82,9 +82,9 @@ public class LoginActivity extends AppCompatActivity
                         startActivity(intent);
                         finish();
                     });
-                }
 
-                response.close();
+                    response.close();
+                }
             }
         });
     }

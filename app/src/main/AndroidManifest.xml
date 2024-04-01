@@ -19,7 +19,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".UserDataActivity"
+            android:name=".UserProfileActivity"
             android:exported="false" />
         <activity
             android:name=".WorkSessionActivity"

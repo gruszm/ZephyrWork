@@ -207,7 +207,7 @@ public class WorkSessionActivity extends AppCompatActivity
 
     private void userProfileOnClickListener(View view)
     {
-        Intent intent = new Intent(this, UserDataActivity.class);
+        Intent intent = new Intent(this, UserProfileActivity.class);
 
         startActivity(intent);
     }
