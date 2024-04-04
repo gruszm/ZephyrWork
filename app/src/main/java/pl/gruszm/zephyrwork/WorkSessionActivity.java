@@ -39,7 +39,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
     private static final int REGISTER_LOCATION_DELAY_MS = 2000;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private boolean callLock;
-    private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn;
+    private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn;
     private TextView workSessionResponse, currentLocation;
     private Location location;
 
@@ -55,12 +55,28 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         startWorkSessionBtn = findViewById(R.id.start_work_session_btn);
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
         userProfileBtn = findViewById(R.id.user_profile_btn);
+        logoutBtn = findViewById(R.id.logout_btn);
+
         workSessionResponse = findViewById(R.id.work_session_response);
         currentLocation = findViewById(R.id.current_location);
 
         startWorkSessionBtn.setOnClickListener(this::startWorkSessionOnClickListener);
         finishWorkSessionBtn.setOnClickListener(this::finishWorkSessionOnClickListener);
         userProfileBtn.setOnClickListener(this::userProfileOnClickListener);
+        logoutBtn.setOnClickListener(this::logoutOnClickListener);
+    }
+
+    private void logoutOnClickListener(View view)
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Intent intent = new Intent(this, LoginActivity.class);
+
+        editor.remove("Auth");
+        editor.apply();
+
+        startActivity(intent);
+        finish();
     }
 
     private void startWorkSessionOnClickListener(View view)
