@@ -7,6 +7,15 @@
     android:layout_height="match_parent"
     tools:context=".UserProfileActivity">
 
+    <Button
+        android:id="@+id/logout_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="LOG OUT"
+        android:textSize="24sp" />
+
     <TextView
         android:id="@+id/user_profile_first_name"
         android:text="First name:"
