@@ -21,27 +21,33 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import pl.gruszm.zephyrwork.DTOs.LocationDTO;
 import pl.gruszm.zephyrwork.config.AppConfig;
 
 public class WorkSessionActivity extends AppCompatActivity implements LocationListener
 {
-    private static final int REGISTER_LOCATION_DELAY_MS = 2000;
+    private static final int LOCATION_TRACKING_DELAY_MS = 5000;
+
+    private OkHttpClient okHttpClient;
+    private Gson gson;
+    private SharedPreferences sharedPreferences;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private boolean callLock;
     private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn;
-    private TextView workSessionResponse, currentLocation;
-    private Location location;
+    private TextView workSessionResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -49,17 +55,23 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_work_session);
 
+        // Common
+        okHttpClient = new OkHttpClient();
+        gson = new Gson();
+        sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         callLock = false;
 
+        // Buttons
         startWorkSessionBtn = findViewById(R.id.start_work_session_btn);
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
         userProfileBtn = findViewById(R.id.user_profile_btn);
         logoutBtn = findViewById(R.id.logout_btn);
 
+        // TextViews
         workSessionResponse = findViewById(R.id.work_session_response);
-        currentLocation = findViewById(R.id.current_location);
 
+        // OnClickListeners
         startWorkSessionBtn.setOnClickListener(this::startWorkSessionOnClickListener);
         finishWorkSessionBtn.setOnClickListener(this::finishWorkSessionOnClickListener);
         userProfileBtn.setOnClickListener(this::userProfileOnClickListener);
@@ -68,15 +80,14 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
 
     private void logoutOnClickListener(View view)
     {
-        SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Intent intent = new Intent(this, LoginActivity.class);
 
         editor.remove("Auth");
         editor.apply();
 
-        startActivity(intent);
         finish();
+        startActivity(intent);
     }
 
     private void startWorkSessionOnClickListener(View view)
@@ -95,8 +106,6 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             return;
         }
 
-        OkHttpClient okHttpClient = new OkHttpClient();
-        SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
@@ -123,8 +132,6 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
             {
-                System.out.println("RESPONSE: " + response.code());
-
                 if (response.isSuccessful())
                 {
                     String responseBody = response.body().string();
@@ -134,9 +141,9 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
                         workSessionResponse.setText(responseBody);
                     });
 
-                    // Start registering the location
+                    // Start the location tracking
                     WorkSessionActivity.this.fusedLocationProviderClient.requestLocationUpdates(
-                            new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, REGISTER_LOCATION_DELAY_MS).build(),
+                            new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_TRACKING_DELAY_MS).build(),
                             WorkSessionActivity.this,
                             Looper.getMainLooper()
                     );
@@ -149,8 +156,8 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
                     {
                         Intent intent = new Intent(WorkSessionActivity.this, LoginActivity.class);
 
-                        startActivity(intent);
                         finish();
+                        startActivity(intent);
                     });
                 }
                 else if (response.code() == 400) // Bad Request, the user already has an active Work Session
@@ -170,8 +177,6 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             return;
         }
 
-        OkHttpClient okHttpClient = new OkHttpClient();
-        SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
@@ -196,8 +201,6 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
             {
-                System.out.println("RESPONSE: " + response.code());
-
                 if (response.isSuccessful())
                 {
                     String responseBody = response.body().string();
@@ -217,8 +220,8 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
                     {
                         Intent intent = new Intent(WorkSessionActivity.this, LoginActivity.class);
 
-                        startActivity(intent);
                         finish();
+                        startActivity(intent);
                     });
                 }
                 else if (response.code() == 400) // Bad Request, the user does not have an active Work Session
@@ -234,12 +237,62 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
     @Override
     public void onLocationChanged(@NonNull Location location)
     {
-        this.location = location;
-        String locationFormatted = String.format(Locale.ENGLISH, "Latitude: %f\nLongitude: %f", this.location.getLatitude(), this.location.getLongitude());
+        String jwt = sharedPreferences.getString("Auth", "");
+        LocationDTO locationDTO = new LocationDTO(LocalDateTime.now().toString(), location.getLatitude(), location.getLongitude());
+        RequestBody requestBody = RequestBody.create(gson.toJson(locationDTO), MediaType.get("application/json"));
 
-        System.out.println(locationFormatted);
+        Request request = new Request.Builder()
+                .url("http://192.168.0.100:8080/api/locations/token")
+                .post(requestBody)
+                .header("Auth", jwt)
+                .build();
 
-        currentLocation.setText(locationFormatted);
+        okHttpClient.newCall(request).enqueue(new Callback()
+        {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e)
+            {
+                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+            {
+                if (response.isSuccessful())
+                {
+                    runOnUiThread(() ->
+                    {
+                        Toast.makeText(WorkSessionActivity.this, "Your location has been saved for the active work session.", Toast.LENGTH_SHORT).show();
+                    });
+
+                    response.close();
+                }
+                else if (response.code() == 400)
+                {
+                    runOnUiThread(() ->
+                    {
+                        Toast.makeText(WorkSessionActivity.this, "You do not have an active work session." +
+                                " Locations tracking has been turned off.", Toast.LENGTH_SHORT).show();
+                    });
+
+                    fusedLocationProviderClient.removeLocationUpdates(WorkSessionActivity.this);
+                }
+                else if (response.code() == 401) // Unauthorized, the token is invalid or missing
+                {
+                    runOnUiThread(() ->
+                    {
+                        Intent intent = new Intent(WorkSessionActivity.this, LoginActivity.class);
+
+                        // Show error message and redirect to Login activity
+                        Toast.makeText(WorkSessionActivity.this, "Authorization error. The locations are still being saved in offline mode and will be resynchronized once you log in.", Toast.LENGTH_SHORT).show();
+                        finish();
+                        startActivity(intent);
+
+                        // TODO: Add the location to a list for a later synchronization.
+                    });
+                }
+            }
+        });
     }
 
     private void userProfileOnClickListener(View view)

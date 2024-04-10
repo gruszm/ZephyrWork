@@ -8,6 +8,23 @@
     tools:context=".WorkSessionActivity">
 
     <Button
+        android:id="@+id/user_profile_btn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:backgroundTint="#00AA00" />
+
+    <Button
+        android:id="@+id/logout_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="LOG OUT"
+        android:textSize="24sp" />
+
+    <Button
         android:id="@+id/start_work_session_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,33 +57,5 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/current_location"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/work_session_response"
-        android:layout_marginTop="30dp"
-        android:layout_marginHorizontal="30dp"
-        android:textSize="20sp" />
-
-    <Button
-        android:id="@+id/user_profile_btn"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:backgroundTint="#00AA00" />
-
-    <Button
-        android:id="@+id/logout_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:text="LOG OUT"
-        android:textSize="24sp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
