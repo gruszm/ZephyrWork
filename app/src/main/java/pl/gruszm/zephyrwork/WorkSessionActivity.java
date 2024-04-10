@@ -252,7 +252,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. The locations are still being saved in offline mode and will be synchronized when possible.", Toast.LENGTH_SHORT).show());
             }
 
             @Override
