@@ -284,7 +284,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
                         Intent intent = new Intent(WorkSessionActivity.this, LoginActivity.class);
 
                         // Show error message and redirect to Login activity
-                        Toast.makeText(WorkSessionActivity.this, "Authorization error. The locations are still being saved in offline mode and will be resynchronized once you log in.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(WorkSessionActivity.this, "Authorization error. The locations are still being saved in offline mode and will be synchronized once you log in.", Toast.LENGTH_SHORT).show();
                         finish();
                         startActivity(intent);
 
