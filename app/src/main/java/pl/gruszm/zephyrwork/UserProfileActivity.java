@@ -65,8 +65,8 @@ public class UserProfileActivity extends AppCompatActivity
         editor.remove("Auth");
         editor.apply();
 
-        startActivity(intent);
         finish();
+        startActivity(intent);
     }
 
     private void retrieveUserData()
@@ -118,8 +118,8 @@ public class UserProfileActivity extends AppCompatActivity
 
                         // Show error message and redirect to Login activity
                         Toast.makeText(UserProfileActivity.this, "Authorization error. Please log in and try again.", Toast.LENGTH_SHORT).show();
-                        startActivity(intent);
                         finish();
+                        startActivity(intent);
                     });
                 }
             }
@@ -172,8 +172,8 @@ public class UserProfileActivity extends AppCompatActivity
 
                         // Show error message and redirect to Login activity
                         Toast.makeText(UserProfileActivity.this, "Authorization error. Please log in and try again.", Toast.LENGTH_SHORT).show();
-                        startActivity(intent);
                         finish();
+                        startActivity(intent);
                     });
                 }
                 else if (response.code() == 404) // User does not have a supervisor

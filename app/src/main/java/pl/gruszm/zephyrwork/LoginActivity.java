@@ -79,8 +79,8 @@ public class LoginActivity extends AppCompatActivity
                     {
                         Intent intent = new Intent(LoginActivity.this, WorkSessionActivity.class);
 
-                        startActivity(intent);
                         finish();
+                        startActivity(intent);
                     });
 
                     response.close();
@@ -137,8 +137,8 @@ public class LoginActivity extends AppCompatActivity
                     {
                         Intent intent = new Intent(LoginActivity.this, WorkSessionActivity.class);
 
-                        startActivity(intent);
                         finish();
+                        startActivity(intent);
                     });
                 }
                 else
