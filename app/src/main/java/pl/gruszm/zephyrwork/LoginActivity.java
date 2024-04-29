@@ -55,7 +55,7 @@ public class LoginActivity extends AppCompatActivity
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
-                .url("http://192.168.0.100:8080/api/auth/validate")
+                .url("https://zephyrwork.onrender.com/api/auth/validate")
                 .get()
                 .header("Auth", jwt)
                 .build();
@@ -104,7 +104,7 @@ public class LoginActivity extends AppCompatActivity
         RequestBody requestBody = RequestBody.create(loginRequestJson, mediaTypeJson);
 
         Request request = new Request.Builder()
-                .url("http://192.168.0.100:8080/api/auth/login")
+                .url("https://zephyrwork.onrender.com/api/auth/login")
                 .post(requestBody)
                 .build();
 

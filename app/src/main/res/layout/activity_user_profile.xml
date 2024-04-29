@@ -21,6 +21,7 @@
         android:text="First name:"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="50dp"
         style="@style/UserProfileStylePrimary" />
 
@@ -57,23 +58,23 @@
         style="@style/UserProfileStyleSecondary" />
 
     <TextView
-        android:id="@+id/user_profile_roles"
-        android:text="Roles:"
+        android:id="@+id/user_profile_role"
+        android:text="Role:"
         app:layout_constraintLeft_toLeftOf="@id/user_profile_email_edit"
         app:layout_constraintTop_toBottomOf="@id/user_profile_email_edit"
         style="@style/UserProfileStylePrimary" />
 
     <TextView
-        android:id="@+id/user_profile_roles_edit"
-        app:layout_constraintLeft_toLeftOf="@id/user_profile_roles"
-        app:layout_constraintTop_toBottomOf="@id/user_profile_roles"
+        android:id="@+id/user_profile_role_edit"
+        app:layout_constraintLeft_toLeftOf="@id/user_profile_role"
+        app:layout_constraintTop_toBottomOf="@id/user_profile_role"
         style="@style/UserProfileStyleSecondary" />
 
     <TextView
         android:id="@+id/user_profile_supervisor_first_name"
         android:text="Supervisor's first name:"
-        app:layout_constraintLeft_toLeftOf="@id/user_profile_roles_edit"
-        app:layout_constraintTop_toBottomOf="@id/user_profile_roles_edit"
+        app:layout_constraintLeft_toLeftOf="@id/user_profile_role_edit"
+        app:layout_constraintTop_toBottomOf="@id/user_profile_role_edit"
         style="@style/UserProfileStylePrimary" />
 
     <TextView

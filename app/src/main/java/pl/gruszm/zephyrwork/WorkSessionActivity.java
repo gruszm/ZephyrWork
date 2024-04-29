@@ -109,7 +109,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
-                .url("http://192.168.0.100:8080/api/worksessions/start")
+                .url("https://zephyrwork.onrender.com/api/worksessions/start")
                 .header("Auth", jwt)
                 .post(RequestBody.create("", null))
                 .build();
@@ -180,7 +180,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
-                .url("http://192.168.0.100:8080/api/worksessions/stop")
+                .url("https://zephyrwork.onrender.com/api/worksessions/stop")
                 .header("Auth", jwt)
                 .post(RequestBody.create("", null))
                 .build();
@@ -242,7 +242,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         RequestBody requestBody = RequestBody.create(gson.toJson(locationDTO), MediaType.get("application/json"));
 
         Request request = new Request.Builder()
-                .url("http://192.168.0.100:8080/api/locations/token")
+                .url("https://zephyrwork.onrender.com/api/locations/token")
                 .post(requestBody)
                 .header("Auth", jwt)
                 .build();
