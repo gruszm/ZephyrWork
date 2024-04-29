@@ -1,4 +1,4 @@
-package pl.gruszm.zephyrwork;
+package pl.gruszm.zephyrwork.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +22,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.api.LoginRequest;
 import pl.gruszm.zephyrwork.config.AppConfig;
 

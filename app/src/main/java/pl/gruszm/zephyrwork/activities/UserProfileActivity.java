@@ -1,4 +1,4 @@
-package pl.gruszm.zephyrwork;
+package pl.gruszm.zephyrwork.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +21,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
+import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
 
 public class UserProfileActivity extends AppCompatActivity
