@@ -29,7 +29,7 @@ public class UserProfileActivity extends AppCompatActivity
     private Gson gson;
     private SharedPreferences sharedPreferences;
     private Button logoutBtn;
-    private TextView firstName, lastName, email, roles, supervisorFirstName, supervisorLastName, supervisorEmail;
+    private TextView firstName, lastName, email, role, supervisorFirstName, supervisorLastName, supervisorEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -46,7 +46,7 @@ public class UserProfileActivity extends AppCompatActivity
         firstName = findViewById(R.id.user_profile_first_name_edit);
         lastName = findViewById(R.id.user_profile_last_name_edit);
         email = findViewById(R.id.user_profile_email_edit);
-        roles = findViewById(R.id.user_profile_roles_edit);
+        role = findViewById(R.id.user_profile_role_edit);
         supervisorFirstName = findViewById(R.id.user_profile_supervisor_first_name_edit);
         supervisorLastName = findViewById(R.id.user_profile_supervisor_last_name_edit);
         supervisorEmail = findViewById(R.id.user_profile_supervisor_email_edit);
@@ -74,7 +74,7 @@ public class UserProfileActivity extends AppCompatActivity
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request userDataRequest = new Request.Builder()
-                .url("http://192.168.0.100:8080/api/users/token")
+                .url("https://zephyrwork.onrender.com/api/users/token")
                 .header("Auth", jwt)
                 .build();
 
@@ -103,7 +103,7 @@ public class UserProfileActivity extends AppCompatActivity
                         firstName.setText(userDTO.getFirstName());
                         lastName.setText(userDTO.getLastName());
                         email.setText(userDTO.getEmail());
-                        roles.setText(String.join(", ", userDTO.getRoles()));
+                        role.setText(userDTO.getRoleName());
                     });
 
                     retrieveSupervisorData();
@@ -131,7 +131,7 @@ public class UserProfileActivity extends AppCompatActivity
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request supervisorDataRequest = new Request.Builder()
-                .url("http://192.168.0.100:8080/api/users/supervisor/token")
+                .url("https://zephyrwork.onrender.com/api/users/supervisor/token")
                 .header("Auth", jwt)
                 .build();
 
