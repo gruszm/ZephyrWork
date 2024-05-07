@@ -36,6 +36,7 @@ import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.LocationDTO;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
+import pl.gruszm.zephyrwork.RegisterNewEmployeeActivity;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.RoleType;
 
@@ -75,9 +76,17 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         finishWorkSessionBtn.setOnClickListener(this::finishWorkSessionOnClickListener);
         userProfileBtn.setOnClickListener(this::userProfileOnClickListener);
         logoutBtn.setOnClickListener(this::logoutOnClickListener);
+        registerNewEmployeeBtn.setOnClickListener(this::registerNewEmployeeListener);
 
         // Enable button for managers and the CEO
         checkRoleAndEnableButton();
+    }
+
+    private void registerNewEmployeeListener(View view)
+    {
+        Intent intent = new Intent(this, RegisterNewEmployeeActivity.class);
+
+        startActivity(intent);
     }
 
     private void checkRoleAndEnableButton()
