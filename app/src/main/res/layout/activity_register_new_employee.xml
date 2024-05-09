@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="@id/registration_email_tv"
             app:layout_constraintTop_toBottomOf="@id/registration_email_tv"
+            android:inputType="textEmailAddress"
             style="@style/RegistrationStyleSecondary" />
 
         <TextView
@@ -42,6 +43,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="@id/registration_repeat_email_tv"
             app:layout_constraintTop_toBottomOf="@id/registration_repeat_email_tv"
+            android:inputType="textEmailAddress"
             style="@style/RegistrationStyleSecondary" />
 
         <TextView
@@ -117,15 +119,14 @@
             android:id="@+id/registration_role_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/registration_role_tv"
-            app:layout_constraintBottom_toBottomOf="@id/registration_role_tv"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/registration_role_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_role_tv"
             android:layout_marginRight="80dp" />
 
         <TextView
             android:id="@+id/registration_supervisor_tv"
-            app:layout_constraintLeft_toLeftOf="@id/registration_role_tv"
-            app:layout_constraintTop_toBottomOf="@id/registration_role_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_role_spinner"
+            app:layout_constraintTop_toBottomOf="@id/registration_role_spinner"
             android:text="supervisor"
             style="@style/RegistrationStylePrimary" />
 
@@ -133,10 +134,19 @@
             android:id="@+id/registration_supervisor_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/registration_supervisor_tv"
-            app:layout_constraintBottom_toBottomOf="@id/registration_supervisor_tv"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/registration_supervisor_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_supervisor_tv"
             android:layout_marginRight="80dp" />
+
+        <Button
+            android:id="@+id/registration_register_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:textSize="28sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/registration_supervisor_spinner" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

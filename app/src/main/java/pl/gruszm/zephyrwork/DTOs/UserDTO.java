@@ -67,4 +67,18 @@ public class UserDTO
 
         return this;
     }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(getFirstName())
+                .append(" ")
+                .append(getLastName())
+                .append(", ")
+                .append(getRoleName());
+
+        return sb.toString();
+    }
 }
