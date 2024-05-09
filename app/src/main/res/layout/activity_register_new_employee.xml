@@ -121,22 +121,27 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/registration_role_tv"
             app:layout_constraintLeft_toLeftOf="@id/registration_role_tv"
-            android:layout_marginRight="80dp" />
+            android:layout_marginTop="20dp"
+            android:spinnerMode="dialog" />
 
         <TextView
             android:id="@+id/registration_supervisor_tv"
             app:layout_constraintLeft_toLeftOf="@id/registration_role_spinner"
             app:layout_constraintTop_toBottomOf="@id/registration_role_spinner"
+            android:layout_marginTop="20dp"
             android:text="supervisor"
             style="@style/RegistrationStylePrimary" />
 
         <Spinner
             android:id="@+id/registration_supervisor_spinner"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/registration_supervisor_tv"
             app:layout_constraintLeft_toLeftOf="@id/registration_supervisor_tv"
-            android:layout_marginRight="80dp" />
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="80dp"
+            android:spinnerMode="dialog" />
 
         <Button
             android:id="@+id/registration_register_btn"
@@ -146,7 +151,8 @@
             android:textSize="28sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/registration_supervisor_spinner" />
+            app:layout_constraintTop_toBottomOf="@id/registration_supervisor_spinner"
+            android:layout_marginTop="20dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

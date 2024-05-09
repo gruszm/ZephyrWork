@@ -99,7 +99,7 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
                             supervisorsDTOs
                     );
 
-                    supervisorSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    supervisorSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_expandable_list_item_1);
 
                     runOnUiThread(() -> supervisorSpinner.setAdapter(supervisorSpinnerAdapter));
 
