@@ -36,7 +36,6 @@ import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.LocationDTO;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
-import pl.gruszm.zephyrwork.RegisterNewEmployeeActivity;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.RoleType;
 
@@ -50,6 +49,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
     private FusedLocationProviderClient fusedLocationProviderClient;
     private boolean callLock;
     private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn, registerNewEmployeeBtn;
+    private String userRole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -85,6 +85,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
     private void registerNewEmployeeListener(View view)
     {
         Intent intent = new Intent(this, RegisterNewEmployeeActivity.class);
+        intent.putExtra("user_role", userRole);
 
         startActivity(intent);
     }
@@ -121,6 +122,8 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
                     {
                         runOnUiThread(() -> registerNewEmployeeBtn.setVisibility(View.VISIBLE));
                     }
+
+                    userRole = userDTO.getRoleName();
                 }
             }
         });

@@ -1,12 +1,14 @@
-package pl.gruszm.zephyrwork;
+package pl.gruszm.zephyrwork.activities;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
@@ -23,21 +25,42 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
+import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.enums.RoleType;
 
 public class RegisterNewEmployeeActivity extends AppCompatActivity
 {
+    private static final int MINIMUM_PASSWORD_LENGTH = 6;
+
     private OkHttpClient okHttpClient;
     private Gson gson;
     private EditText email, repeatEmail, firstName, lastName, password, repeatPassword;
     private Spinner roleSpinner, supervisorSpinner;
     private Button registerBtn;
+    private String userRole;
+    private RoleType[] rolesChoice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_new_employee);
+
+        if (savedInstanceState == null)
+        {
+            Bundle extras = getIntent().getExtras();
+            userRole = extras.getString("user_role");
+
+            // Set the choice of roles to those lower than user's role
+            if (userRole.equals(RoleType.CEO.name()))
+            {
+                rolesChoice = new RoleType[]{RoleType.EMPLOYEE, RoleType.MANAGER};
+            }
+            else
+            {
+                rolesChoice = new RoleType[]{RoleType.EMPLOYEE};
+            }
+        }
 
         okHttpClient = new OkHttpClient();
         gson = new Gson();
@@ -52,7 +75,60 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
         supervisorSpinner = findViewById(R.id.registration_supervisor_spinner);
         registerBtn = findViewById(R.id.registration_register_btn);
 
+        registerBtn.setOnClickListener(this::registerOnClickListener);
+
         populateSpinners();
+    }
+
+    private void registerOnClickListener(View view)
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder
+                .setTitle("Error")
+                .setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
+
+        // Check, if all fields are filled
+        if (email.getText().toString().isEmpty()
+                || repeatEmail.getText().toString().isEmpty()
+                || firstName.getText().toString().isEmpty()
+                || lastName.getText().toString().isEmpty()
+                || password.getText().toString().isEmpty()
+                || repeatPassword.getText().toString().isEmpty())
+        {
+            alertDialogBuilder.setMessage("All fields must be filled.");
+            alertDialogBuilder.create().show();
+
+            return;
+        }
+
+        // Check, if the 'repeat' fields are the same as the original ones
+
+        if (!email.getText().toString().equals(repeatEmail.getText().toString()))
+        {
+            alertDialogBuilder.setMessage("The email and repeat email fields are not the same.");
+            alertDialogBuilder.create().show();
+
+            return;
+        }
+
+        if (!password.getText().toString().equals(repeatPassword.getText().toString()))
+        {
+            alertDialogBuilder.setMessage("The password and repeat password fields are not the same.");
+            alertDialogBuilder.create().show();
+
+            return;
+        }
+
+        if (password.getText().toString().length() < MINIMUM_PASSWORD_LENGTH)
+        {
+            alertDialogBuilder.setMessage("The password must be at least 6 characters long.");
+            alertDialogBuilder.create().show();
+
+            return;
+        }
+
+        // TODO: Request to backend to register a new employee
     }
 
     private void populateSpinners()
@@ -60,7 +136,7 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
         ArrayAdapter<RoleType> roleSpinnerAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
-                RoleType.values()
+                rolesChoice
         );
 
         roleSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

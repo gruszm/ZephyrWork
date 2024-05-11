@@ -12,8 +12,6 @@ public class RegistrationDTO
 
     private String password;
 
-    private String repeatPassword;
-
     private Integer supervisorId;
 
     private RoleType role;
@@ -66,18 +64,6 @@ public class RegistrationDTO
         return this;
     }
 
-    public String getRepeatPassword()
-    {
-        return repeatPassword;
-    }
-
-    public RegistrationDTO setRepeatPassword(String repeatPassword)
-    {
-        this.repeatPassword = repeatPassword;
-
-        return this;
-    }
-
     public Integer getSupervisorId()
     {
         return supervisorId;
@@ -100,10 +86,5 @@ public class RegistrationDTO
         this.role = role;
 
         return this;
-    }
-
-    public boolean arePasswordFieldsDifferent()
-    {
-        return !password.equals(repeatPassword);
     }
 }
