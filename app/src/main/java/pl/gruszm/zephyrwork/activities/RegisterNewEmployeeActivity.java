@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -26,6 +27,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
+import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.RoleType;
 
 public class RegisterNewEmployeeActivity extends AppCompatActivity
@@ -62,9 +64,11 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
             }
         }
 
+        // Common
         okHttpClient = new OkHttpClient();
         gson = new Gson();
 
+        // Views
         email = findViewById(R.id.registration_email_et);
         repeatEmail = findViewById(R.id.registration_repeat_email_et);
         firstName = findViewById(R.id.registration_first_name_et);
@@ -75,8 +79,10 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
         supervisorSpinner = findViewById(R.id.registration_supervisor_spinner);
         registerBtn = findViewById(R.id.registration_register_btn);
 
+        // OnClickListeners
         registerBtn.setOnClickListener(this::registerOnClickListener);
 
+        // Populate the spinners with roles and supervisors
         populateSpinners();
     }
 
@@ -145,7 +151,7 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
 
         Request request = new Request.Builder()
                 .get()
-                .url("https://zephyrwork.onrender.com/api/users/supervisors")
+                .url(AppConfig.BACKEND_BASE.concat("/users/supervisors"))
                 .build();
 
         Call call = okHttpClient.newCall(request);
@@ -155,7 +161,9 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
+                Toast.makeText(RegisterNewEmployeeActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
 
+                finish();
             }
 
             @Override

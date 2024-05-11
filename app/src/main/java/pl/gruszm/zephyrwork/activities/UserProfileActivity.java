@@ -75,7 +75,7 @@ public class UserProfileActivity extends AppCompatActivity
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request userDataRequest = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/users/token")
+                .url(AppConfig.BACKEND_BASE.concat("/users/token"))
                 .header("Auth", jwt)
                 .build();
 
@@ -132,7 +132,7 @@ public class UserProfileActivity extends AppCompatActivity
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request supervisorDataRequest = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/users/supervisor/token")
+                .url(AppConfig.BACKEND_BASE.concat("/users/supervisor/token"))
                 .header("Auth", jwt)
                 .build();
 

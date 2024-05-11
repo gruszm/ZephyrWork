@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/auth/validate")
+                .url(AppConfig.BACKEND_BASE.concat("/auth/validate"))
                 .get()
                 .header("Auth", jwt)
                 .build();
@@ -105,7 +105,7 @@ public class LoginActivity extends AppCompatActivity
         RequestBody requestBody = RequestBody.create(loginRequestJson, mediaTypeJson);
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/auth/login")
+                .url(AppConfig.BACKEND_BASE.concat("/auth/login"))
                 .post(requestBody)
                 .build();
 

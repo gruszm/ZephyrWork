@@ -95,7 +95,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/users/token")
+                .url(AppConfig.BACKEND_BASE.concat("/users/token"))
                 .header("Auth", jwt)
                 .get()
                 .build();
@@ -160,7 +160,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/worksessions/start")
+                .url(AppConfig.BACKEND_BASE.concat("/worksessions/start"))
                 .header("Auth", jwt)
                 .post(RequestBody.create("", null))
                 .build();
@@ -224,7 +224,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/worksessions/stop")
+                .url(AppConfig.BACKEND_BASE.concat("/worksessions/stop"))
                 .header("Auth", jwt)
                 .post(RequestBody.create("", null))
                 .build();
@@ -279,7 +279,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         RequestBody requestBody = RequestBody.create(gson.toJson(locationDTO), MediaType.get("application/json"));
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/locations/token")
+                .url(AppConfig.BACKEND_BASE.concat("/locations/token"))
                 .post(requestBody)
                 .header("Auth", jwt)
                 .build();
