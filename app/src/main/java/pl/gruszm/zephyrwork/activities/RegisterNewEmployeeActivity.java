@@ -46,7 +46,7 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
     private Gson gson;
     private EditText email, repeatEmail, firstName, lastName, password, repeatPassword;
     private Spinner roleSpinner, supervisorSpinner;
-    private Button registerBtn;
+    private Button registerBtn, logoutBtn;
     private String userRole;
     private RoleType[] rolesChoice;
 
@@ -77,22 +77,40 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
         okHttpClient = new OkHttpClient();
         gson = new Gson();
 
-        // Views
+        // Edit Texts
         email = findViewById(R.id.registration_email_et);
         repeatEmail = findViewById(R.id.registration_repeat_email_et);
         firstName = findViewById(R.id.registration_first_name_et);
         lastName = findViewById(R.id.registration_last_name_et);
         password = findViewById(R.id.registration_password_et);
         repeatPassword = findViewById(R.id.registration_repeat_password_et);
+
+        // Spinners
         roleSpinner = findViewById(R.id.registration_role_spinner);
         supervisorSpinner = findViewById(R.id.registration_supervisor_spinner);
+
+        // Buttons
         registerBtn = findViewById(R.id.registration_register_btn);
+        logoutBtn = findViewById(R.id.logout_btn);
 
         // OnClickListeners
         registerBtn.setOnClickListener(this::registerOnClickListener);
+        logoutBtn.setOnClickListener(this::logoutOnClickListener);
 
         // Populate the spinners with roles and supervisors
         populateSpinners();
+    }
+
+    private void logoutOnClickListener(View view)
+    {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Intent intent = new Intent(this, LoginActivity.class);
+
+        editor.remove("Auth");
+        editor.apply();
+
+        finish();
+        startActivity(intent);
     }
 
     private void registerOnClickListener(View view)
@@ -178,7 +196,7 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
                         sb.append(firstName.getText().toString())
                                 .append(" ")
                                 .append(lastName.getText().toString())
-                                .append(" has been successfully registered in the database!");
+                                .append(" has been successfully registered in the database.");
 
                         alertDialogBuilder.setTitle("Info");
                         alertDialogBuilder.setMessage(sb.toString());
