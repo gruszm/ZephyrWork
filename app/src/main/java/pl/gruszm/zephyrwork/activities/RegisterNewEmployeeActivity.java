@@ -1,5 +1,9 @@
 package pl.gruszm.zephyrwork.activities;
 
+import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -22,9 +26,12 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import pl.gruszm.zephyrwork.DTOs.RegistrationDTO;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
@@ -34,6 +41,7 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
 {
     private static final int MINIMUM_PASSWORD_LENGTH = 6;
 
+    private SharedPreferences sharedPreferences;
     private OkHttpClient okHttpClient;
     private Gson gson;
     private EditText email, repeatEmail, firstName, lastName, password, repeatPassword;
@@ -65,6 +73,7 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
         }
 
         // Common
+        sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         okHttpClient = new OkHttpClient();
         gson = new Gson();
 
@@ -134,7 +143,88 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
             return;
         }
 
-        // TODO: Request to backend to register a new employee
+        RegistrationDTO registrationDTO = new RegistrationDTO()
+                .setEmail(email.getText().toString())
+                .setPassword(password.getText().toString())
+                .setFirstName(firstName.getText().toString())
+                .setLastName(lastName.getText().toString())
+                .setRole(RoleType.valueOf(roleSpinner.getSelectedItem().toString()))
+                .setSupervisorId(((UserDTO) supervisorSpinner.getSelectedItem()).getId());
+
+        RequestBody requestBody = RequestBody.create(gson.toJson(registrationDTO), MediaType.get("application/json"));
+        Request registrationRequest = new Request.Builder()
+                .url(AppConfig.BACKEND_BASE.concat("/users/register"))
+                .post(requestBody)
+                .header("Auth", sharedPreferences.getString("Auth", ""))
+                .build();
+        Call call = okHttpClient.newCall(registrationRequest);
+
+        call.enqueue(new Callback()
+        {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e)
+            {
+                Toast.makeText(RegisterNewEmployeeActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+            {
+                if (response.isSuccessful())
+                {
+                    runOnUiThread(() ->
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(firstName.getText().toString())
+                                .append(" ")
+                                .append(lastName.getText().toString())
+                                .append(" has been successfully registered in the database!");
+
+                        alertDialogBuilder.setTitle("Info");
+                        alertDialogBuilder.setMessage(sb.toString());
+                        alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
+                        {
+                            dialogInterface.dismiss();
+                            finish();
+                        });
+                        alertDialogBuilder.create().show();
+                    });
+                }
+                else if (response.code() == 401) // Unauthorized
+                {
+                    // Show error message and redirect to Login activity
+                    runOnUiThread(() ->
+                    {
+                        alertDialogBuilder.setMessage("Authorization error. Please log in and try again.");
+                        alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
+                        {
+                            Intent intent = new Intent(RegisterNewEmployeeActivity.this, LoginActivity.class);
+
+                            dialogInterface.dismiss();
+                            finish();
+                            startActivity(intent);
+                        });
+                        alertDialogBuilder.create().show();
+                    });
+                }
+                else if (response.code() == 409) // Conflict - a user with this email already exists
+                {
+                    runOnUiThread(() ->
+                    {
+                        alertDialogBuilder.setMessage("An employee with this email already exists.");
+                        alertDialogBuilder.create().show();
+                    });
+                }
+                else
+                {
+                    runOnUiThread(() ->
+                    {
+                        alertDialogBuilder.setMessage("An error occurred during the registration process. Please check the form and try again.");
+                        alertDialogBuilder.create().show();
+                    });
+                }
+            }
+        });
     }
 
     private void populateSpinners()
@@ -161,7 +251,7 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                Toast.makeText(RegisterNewEmployeeActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterNewEmployeeActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
 
                 finish();
             }
@@ -188,6 +278,15 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
                     runOnUiThread(() -> supervisorSpinner.setAdapter(supervisorSpinnerAdapter));
 
                     response.close();
+                }
+                else
+                {
+                    runOnUiThread(() ->
+                    {
+                        Toast.makeText(RegisterNewEmployeeActivity.this, "Unknown error occurred. Please try again.", Toast.LENGTH_SHORT).show();
+
+                        finish();
+                    });
                 }
             }
         });

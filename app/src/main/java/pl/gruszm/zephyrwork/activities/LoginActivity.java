@@ -1,5 +1,7 @@
 package pl.gruszm.zephyrwork.activities;
 
+import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -68,7 +70,7 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -117,7 +119,7 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
 
                 callLock = false;
             }

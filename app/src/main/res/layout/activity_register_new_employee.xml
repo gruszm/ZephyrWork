@@ -18,7 +18,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginLeft="80dp"
             android:layout_marginTop="50dp"
-            android:text="email"
+            android:text="Email"
             style="@style/RegistrationStylePrimary" />
 
         <EditText
@@ -34,7 +34,7 @@
             android:id="@+id/registration_repeat_email_tv"
             app:layout_constraintLeft_toLeftOf="@id/registration_email_et"
             app:layout_constraintTop_toBottomOf="@id/registration_email_et"
-            android:text="repeat email"
+            android:text="Repeat Email"
             style="@style/RegistrationStylePrimary" />
 
         <EditText
@@ -50,7 +50,7 @@
             android:id="@+id/registration_first_name_tv"
             app:layout_constraintLeft_toLeftOf="@id/registration_repeat_email_et"
             app:layout_constraintTop_toBottomOf="@id/registration_repeat_email_et"
-            android:text="first name"
+            android:text="First Name"
             style="@style/RegistrationStylePrimary" />
 
         <EditText
@@ -59,13 +59,14 @@
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="@id/registration_first_name_tv"
             app:layout_constraintTop_toBottomOf="@id/registration_first_name_tv"
+            android:inputType="textCapWords"
             style="@style/RegistrationStyleSecondary" />
 
         <TextView
             android:id="@+id/registration_last_name_tv"
             app:layout_constraintLeft_toLeftOf="@id/registration_first_name_et"
             app:layout_constraintTop_toBottomOf="@id/registration_first_name_et"
-            android:text="last name"
+            android:text="Last Name"
             style="@style/RegistrationStylePrimary" />
 
         <EditText
@@ -74,13 +75,14 @@
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="@id/registration_last_name_tv"
             app:layout_constraintTop_toBottomOf="@id/registration_last_name_tv"
+            android:inputType="textCapWords"
             style="@style/RegistrationStyleSecondary" />
 
         <TextView
             android:id="@+id/registration_password_tv"
             app:layout_constraintLeft_toLeftOf="@id/registration_first_name_et"
             app:layout_constraintTop_toBottomOf="@id/registration_last_name_et"
-            android:text="password"
+            android:text="Password"
             style="@style/RegistrationStylePrimary" />
 
         <EditText
@@ -96,7 +98,7 @@
             android:id="@+id/registration_repeat_password_tv"
             app:layout_constraintLeft_toLeftOf="@id/registration_password_et"
             app:layout_constraintTop_toBottomOf="@id/registration_password_et"
-            android:text="repeat password"
+            android:text="Repeat Password"
             style="@style/RegistrationStylePrimary" />
 
         <EditText
@@ -112,7 +114,7 @@
             android:id="@+id/registration_role_tv"
             app:layout_constraintLeft_toLeftOf="@id/registration_repeat_password_et"
             app:layout_constraintTop_toBottomOf="@id/registration_repeat_password_et"
-            android:text="role"
+            android:text="Role"
             style="@style/RegistrationStylePrimary" />
 
         <Spinner
@@ -129,7 +131,7 @@
             app:layout_constraintLeft_toLeftOf="@id/registration_role_spinner"
             app:layout_constraintTop_toBottomOf="@id/registration_role_spinner"
             android:layout_marginTop="20dp"
-            android:text="supervisor"
+            android:text="Supervisor"
             style="@style/RegistrationStylePrimary" />
 
         <Spinner
@@ -152,7 +154,9 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/registration_supervisor_spinner"
-            android:layout_marginTop="20dp" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

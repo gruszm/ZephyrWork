@@ -1,5 +1,7 @@
 package pl.gruszm.zephyrwork.activities;
 
+import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -107,7 +109,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -173,7 +175,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
 
                 callLock = false;
             }
@@ -237,7 +239,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
 
                 callLock = false;
             }

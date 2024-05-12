@@ -1,5 +1,7 @@
 package pl.gruszm.zephyrwork.activities;
 
+import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -86,7 +88,7 @@ public class UserProfileActivity extends AppCompatActivity
             {
                 runOnUiThread(() ->
                 {
-                    Toast.makeText(UserProfileActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserProfileActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
 
                     finish();
                 });
@@ -143,7 +145,7 @@ public class UserProfileActivity extends AppCompatActivity
             {
                 runOnUiThread(() ->
                 {
-                    Toast.makeText(UserProfileActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserProfileActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
 
                     finish();
                 });
