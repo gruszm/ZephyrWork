@@ -55,6 +55,8 @@
         android:id="@+id/user_profile_email_edit"
         app:layout_constraintLeft_toLeftOf="@id/user_profile_email"
         app:layout_constraintTop_toBottomOf="@id/user_profile_email"
+        android:autoSizeTextType="uniform"
+        android:maxLines="1"
         style="@style/UserProfileStyleSecondary" />
 
     <TextView
