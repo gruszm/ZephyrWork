@@ -126,6 +126,8 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
                     }
 
                     userRole = userDTO.getRoleName();
+
+                    response.close();
                 }
             }
         });

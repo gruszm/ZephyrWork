@@ -282,13 +282,13 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
                     Type listType = new TypeToken<ArrayList<UserDTO>>()
                     {
                     }.getType();
-                    List<UserDTO> supervisorsDTOs = gson.fromJson(response.body().string(), listType);
+                    List<UserDTO> supervisorDTOs = gson.fromJson(response.body().string(), listType);
                     ArrayAdapter<UserDTO> supervisorSpinnerAdapter;
 
                     supervisorSpinnerAdapter = new ArrayAdapter<>(
                             RegisterNewEmployeeActivity.this,
                             android.R.layout.simple_spinner_item,
-                            supervisorsDTOs
+                            supervisorDTOs
                     );
 
                     supervisorSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_expandable_list_item_1);
