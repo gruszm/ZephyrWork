@@ -2,11 +2,24 @@ package pl.gruszm.zephyrwork.DTOs;
 
 public class UserDTO
 {
+    private int id;
     private String email;
     private String firstName;
     private String lastName;
     private Integer supervisorId;
     private String roleName;
+
+    public int getId()
+    {
+        return id;
+    }
+
+    public UserDTO setId(int id)
+    {
+        this.id = id;
+
+        return this;
+    }
 
     public String getEmail()
     {
@@ -66,5 +79,21 @@ public class UserDTO
         this.roleName = roleName;
 
         return this;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(getFirstName())
+                .append(" ")
+                .append(getLastName())
+                .append(", ")
+                .append(getRoleName())
+                .append('\n')
+                .append(getEmail());
+
+        return sb.toString();
     }
 }

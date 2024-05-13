@@ -1,4 +1,6 @@
-package pl.gruszm.zephyrwork;
+package pl.gruszm.zephyrwork.activities;
+
+import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +23,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
+import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
 
 public class UserProfileActivity extends AppCompatActivity
@@ -74,7 +77,7 @@ public class UserProfileActivity extends AppCompatActivity
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request userDataRequest = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/users/token")
+                .url(AppConfig.BACKEND_BASE.concat("/users/token"))
                 .header("Auth", jwt)
                 .build();
 
@@ -85,7 +88,7 @@ public class UserProfileActivity extends AppCompatActivity
             {
                 runOnUiThread(() ->
                 {
-                    Toast.makeText(UserProfileActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserProfileActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
 
                     finish();
                 });
@@ -131,7 +134,7 @@ public class UserProfileActivity extends AppCompatActivity
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request supervisorDataRequest = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/users/supervisor/token")
+                .url(AppConfig.BACKEND_BASE.concat("/users/supervisor/token"))
                 .header("Auth", jwt)
                 .build();
 
@@ -142,7 +145,7 @@ public class UserProfileActivity extends AppCompatActivity
             {
                 runOnUiThread(() ->
                 {
-                    Toast.makeText(UserProfileActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserProfileActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
 
                     finish();
                 });

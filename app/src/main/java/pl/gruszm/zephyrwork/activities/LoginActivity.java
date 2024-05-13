@@ -1,4 +1,6 @@
-package pl.gruszm.zephyrwork;
+package pl.gruszm.zephyrwork.activities;
+
+import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +24,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.api.LoginRequest;
 import pl.gruszm.zephyrwork.config.AppConfig;
 
@@ -55,7 +58,7 @@ public class LoginActivity extends AppCompatActivity
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/auth/validate")
+                .url(AppConfig.BACKEND_BASE.concat("/auth/validate"))
                 .get()
                 .header("Auth", jwt)
                 .build();
@@ -67,7 +70,7 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -104,7 +107,7 @@ public class LoginActivity extends AppCompatActivity
         RequestBody requestBody = RequestBody.create(loginRequestJson, mediaTypeJson);
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/auth/login")
+                .url(AppConfig.BACKEND_BASE.concat("/auth/login"))
                 .post(requestBody)
                 .build();
 
@@ -116,7 +119,7 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
 
                 callLock = false;
             }

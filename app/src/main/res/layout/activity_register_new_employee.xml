@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.RegisterNewEmployeeActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/logout_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="LOG OUT"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/registration_email_tv"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="50dp"
+            android:text="Email"
+            style="@style/RegistrationStylePrimary" />
+
+        <EditText
+            android:id="@+id/registration_email_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="@id/registration_email_tv"
+            app:layout_constraintTop_toBottomOf="@id/registration_email_tv"
+            android:inputType="textEmailAddress"
+            style="@style/RegistrationStyleSecondary" />
+
+        <TextView
+            android:id="@+id/registration_repeat_email_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_email_et"
+            app:layout_constraintTop_toBottomOf="@id/registration_email_et"
+            android:text="Repeat Email"
+            style="@style/RegistrationStylePrimary" />
+
+        <EditText
+            android:id="@+id/registration_repeat_email_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="@id/registration_repeat_email_tv"
+            app:layout_constraintTop_toBottomOf="@id/registration_repeat_email_tv"
+            android:inputType="textEmailAddress"
+            style="@style/RegistrationStyleSecondary" />
+
+        <TextView
+            android:id="@+id/registration_first_name_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_repeat_email_et"
+            app:layout_constraintTop_toBottomOf="@id/registration_repeat_email_et"
+            android:text="First Name"
+            style="@style/RegistrationStylePrimary" />
+
+        <EditText
+            android:id="@+id/registration_first_name_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="@id/registration_first_name_tv"
+            app:layout_constraintTop_toBottomOf="@id/registration_first_name_tv"
+            android:inputType="textCapWords"
+            style="@style/RegistrationStyleSecondary" />
+
+        <TextView
+            android:id="@+id/registration_last_name_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_first_name_et"
+            app:layout_constraintTop_toBottomOf="@id/registration_first_name_et"
+            android:text="Last Name"
+            style="@style/RegistrationStylePrimary" />
+
+        <EditText
+            android:id="@+id/registration_last_name_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="@id/registration_last_name_tv"
+            app:layout_constraintTop_toBottomOf="@id/registration_last_name_tv"
+            android:inputType="textCapWords"
+            style="@style/RegistrationStyleSecondary" />
+
+        <TextView
+            android:id="@+id/registration_password_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_first_name_et"
+            app:layout_constraintTop_toBottomOf="@id/registration_last_name_et"
+            android:text="Password"
+            style="@style/RegistrationStylePrimary" />
+
+        <EditText
+            android:id="@+id/registration_password_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="@id/registration_password_tv"
+            app:layout_constraintTop_toBottomOf="@id/registration_password_tv"
+            android:inputType="textPassword"
+            style="@style/RegistrationStyleSecondary" />
+
+        <TextView
+            android:id="@+id/registration_repeat_password_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_password_et"
+            app:layout_constraintTop_toBottomOf="@id/registration_password_et"
+            android:text="Repeat Password"
+            style="@style/RegistrationStylePrimary" />
+
+        <EditText
+            android:id="@+id/registration_repeat_password_et"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="@id/registration_repeat_password_tv"
+            app:layout_constraintTop_toBottomOf="@id/registration_repeat_password_tv"
+            android:inputType="textPassword"
+            style="@style/RegistrationStyleSecondary" />
+
+        <TextView
+            android:id="@+id/registration_role_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_repeat_password_et"
+            app:layout_constraintTop_toBottomOf="@id/registration_repeat_password_et"
+            android:text="Role"
+            style="@style/RegistrationStylePrimary" />
+
+        <Spinner
+            android:id="@+id/registration_role_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/registration_role_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_role_tv"
+            android:layout_marginTop="20dp"
+            android:spinnerMode="dialog" />
+
+        <TextView
+            android:id="@+id/registration_supervisor_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_role_spinner"
+            app:layout_constraintTop_toBottomOf="@id/registration_role_spinner"
+            android:layout_marginTop="20dp"
+            android:text="Supervisor"
+            style="@style/RegistrationStylePrimary" />
+
+        <Spinner
+            android:id="@+id/registration_supervisor_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/registration_supervisor_tv"
+            app:layout_constraintLeft_toLeftOf="@id/registration_supervisor_tv"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="80dp"
+            android:spinnerMode="dialog" />
+
+        <Button
+            android:id="@+id/registration_register_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:textSize="28sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/registration_supervisor_spinner"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

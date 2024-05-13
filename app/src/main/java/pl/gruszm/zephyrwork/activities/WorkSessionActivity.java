@@ -1,4 +1,6 @@
-package pl.gruszm.zephyrwork;
+package pl.gruszm.zephyrwork.activities;
+
+import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -10,7 +12,6 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,7 +36,10 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.LocationDTO;
+import pl.gruszm.zephyrwork.DTOs.UserDTO;
+import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
+import pl.gruszm.zephyrwork.enums.RoleType;
 
 public class WorkSessionActivity extends AppCompatActivity implements LocationListener
 {
@@ -46,8 +50,8 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
     private SharedPreferences sharedPreferences;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private boolean callLock;
-    private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn;
-    private TextView workSessionResponse;
+    private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn, registerNewEmployeeBtn;
+    private String userRole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -67,15 +71,66 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
         userProfileBtn = findViewById(R.id.user_profile_btn);
         logoutBtn = findViewById(R.id.logout_btn);
-
-        // TextViews
-        workSessionResponse = findViewById(R.id.work_session_response);
+        registerNewEmployeeBtn = findViewById(R.id.register_new_employee_btn);
 
         // OnClickListeners
         startWorkSessionBtn.setOnClickListener(this::startWorkSessionOnClickListener);
         finishWorkSessionBtn.setOnClickListener(this::finishWorkSessionOnClickListener);
         userProfileBtn.setOnClickListener(this::userProfileOnClickListener);
         logoutBtn.setOnClickListener(this::logoutOnClickListener);
+        registerNewEmployeeBtn.setOnClickListener(this::registerNewEmployeeListener);
+
+        // Enable button for managers and the CEO
+        checkRoleAndEnableButton();
+    }
+
+    private void registerNewEmployeeListener(View view)
+    {
+        Intent intent = new Intent(this, RegisterNewEmployeeActivity.class);
+        intent.putExtra("user_role", userRole);
+
+        startActivity(intent);
+    }
+
+    private void checkRoleAndEnableButton()
+    {
+        String jwt = sharedPreferences.getString("Auth", "");
+
+        Request request = new Request.Builder()
+                .url(AppConfig.BACKEND_BASE.concat("/users/token"))
+                .header("Auth", jwt)
+                .get()
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+
+        call.enqueue(new Callback()
+        {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e)
+            {
+                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+            {
+                if (response.isSuccessful())
+                {
+                    UserDTO userDTO = gson.fromJson(response.body().string(), UserDTO.class);
+
+                    // Regular employees cannot register new employees
+                    if (!userDTO.getRoleName().equals(RoleType.EMPLOYEE.name()))
+                    {
+                        runOnUiThread(() -> registerNewEmployeeBtn.setVisibility(View.VISIBLE));
+                    }
+
+                    userRole = userDTO.getRoleName();
+
+                    response.close();
+                }
+            }
+        });
     }
 
     private void logoutOnClickListener(View view)
@@ -109,7 +164,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/worksessions/start")
+                .url(AppConfig.BACKEND_BASE.concat("/worksessions/start"))
                 .header("Auth", jwt)
                 .post(RequestBody.create("", null))
                 .build();
@@ -122,7 +177,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
 
                 callLock = false;
             }
@@ -134,13 +189,6 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             {
                 if (response.isSuccessful())
                 {
-                    String responseBody = response.body().string();
-
-                    runOnUiThread(() ->
-                    {
-                        workSessionResponse.setText(responseBody);
-                    });
-
                     // Start the location tracking
                     WorkSessionActivity.this.fusedLocationProviderClient.requestLocationUpdates(
                             new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_TRACKING_DELAY_MS).build(),
@@ -180,7 +228,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/worksessions/stop")
+                .url(AppConfig.BACKEND_BASE.concat("/worksessions/stop"))
                 .header("Auth", jwt)
                 .post(RequestBody.create("", null))
                 .build();
@@ -193,7 +241,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
 
                 callLock = false;
             }
@@ -203,13 +251,6 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             {
                 if (response.isSuccessful())
                 {
-                    String responseBody = response.body().string();
-
-                    runOnUiThread(() ->
-                    {
-                        workSessionResponse.setText(responseBody);
-                    });
-
                     fusedLocationProviderClient.removeLocationUpdates(WorkSessionActivity.this);
 
                     response.close();
@@ -242,7 +283,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         RequestBody requestBody = RequestBody.create(gson.toJson(locationDTO), MediaType.get("application/json"));
 
         Request request = new Request.Builder()
-                .url("https://zephyrwork.onrender.com/api/locations/token")
+                .url(AppConfig.BACKEND_BASE.concat("/locations/token"))
                 .post(requestBody)
                 .header("Auth", jwt)
                 .build();
