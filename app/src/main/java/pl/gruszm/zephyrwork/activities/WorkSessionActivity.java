@@ -10,18 +10,24 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -41,16 +47,28 @@ import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.RoleType;
 
-public class WorkSessionActivity extends AppCompatActivity implements LocationListener
+public class WorkSessionActivity extends AppCompatActivity implements LocationListener, NavigationView.OnNavigationItemSelectedListener
 {
+    // Constants
     private static final int LOCATION_TRACKING_DELAY_MS = 5000;
 
+    // Common
     private OkHttpClient okHttpClient;
     private Gson gson;
     private SharedPreferences sharedPreferences;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private boolean callLock;
+
+    // Buttons
     private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn, registerNewEmployeeBtn;
+
+    // Layout
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle toggle;
+    private Toolbar toolbar;
+    private NavigationView navigationView;
+
+    // Other
     private String userRole;
 
     @Override
@@ -66,6 +84,17 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         callLock = false;
 
+        // Layout
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        toolbar = findViewById(R.id.toolbar);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
+        // Configure navigation
+        setSupportActionBar(toolbar);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
         // Buttons
         startWorkSessionBtn = findViewById(R.id.start_work_session_btn);
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
@@ -80,8 +109,56 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         logoutBtn.setOnClickListener(this::logoutOnClickListener);
         registerNewEmployeeBtn.setOnClickListener(this::registerNewEmployeeListener);
 
+        // Toolbar and navigation handling
+        toolbar.setNavigationOnClickListener(this::navigationOnClickListener);
+        navigationView.setNavigationItemSelectedListener(this);
+
         // Enable button for managers and the CEO
         checkRoleAndEnableButton();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
+    {
+        int id = menuItem.getItemId();
+
+        if (id == R.id.my_work_sessions)
+        {
+
+        }
+        else if (id == R.id.employees_work_sessions)
+        {
+
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+
+        return true;
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START))
+        {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
+        else
+        {
+            super.onBackPressed();
+        }
+    }
+
+    private void navigationOnClickListener(View view)
+    {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START))
+        {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
+        else
+        {
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
     }
 
     private void registerNewEmployeeListener(View view)
