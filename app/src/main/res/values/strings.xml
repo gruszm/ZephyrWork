@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ZephyrWork</string>
+    <string name="navigation_drawer_open">Open navigation bar</string>
+    <string name="navigation_drawer_close">Close navigation bar</string>
+    <string name="nav_header_title">First Name and Last Name</string>
+    <string name="nav_header_subtitle">email@zephyrwork.com</string>
 </resources>
