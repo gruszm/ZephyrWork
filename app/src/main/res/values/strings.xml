@@ -4,5 +4,4 @@
     <string name="navigation_drawer_close">Close navigation bar</string>
     <string name="nav_header_title">First Name and Last Name</string>
     <string name="nav_header_subtitle">email@zephyrwork.com</string>
-    <string name="nav_header_desc">Navigation header</string>
 </resources>
