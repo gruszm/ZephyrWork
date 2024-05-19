@@ -13,6 +13,7 @@ import android.os.Looper;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -68,6 +69,9 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
     private Toolbar toolbar;
     private NavigationView navigationView;
 
+    // Navigation Header Views
+    private TextView firstNameAndLastName, email;
+
     // Other
     private String userRole;
 
@@ -95,6 +99,10 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+        // Navigation Header Views
+        firstNameAndLastName = navigationView.getHeaderView(0).findViewById(R.id.nav_header_name);
+        email = navigationView.getHeaderView(0).findViewById(R.id.nav_header_email);
+
         // Buttons
         startWorkSessionBtn = findViewById(R.id.start_work_session_btn);
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
@@ -113,8 +121,8 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         toolbar.setNavigationOnClickListener(this::navigationOnClickListener);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // Enable button for managers and the CEO
-        checkRoleAndEnableButton();
+        // Enable button for managers and the CEO, update data in the navigation header
+        checkUserDataAndUpdateView();
     }
 
     @Override
@@ -169,7 +177,7 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         startActivity(intent);
     }
 
-    private void checkRoleAndEnableButton()
+    private void checkUserDataAndUpdateView()
     {
         String jwt = sharedPreferences.getString("Auth", "");
 
@@ -201,6 +209,15 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
                     {
                         runOnUiThread(() -> registerNewEmployeeBtn.setVisibility(View.VISIBLE));
                     }
+
+                    runOnUiThread(() ->
+                    {
+                        firstNameAndLastName.setText(userDTO.getFirstName()
+                                .concat(" ")
+                                .concat(userDTO.getLastName()));
+
+                        email.setText(userDTO.getEmail());
+                    });
 
                     userRole = userDTO.getRoleName();
 
