@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,7 +40,7 @@ public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionView
     // List of work sessions
     private List<WorkSessionDTO> workSessionDTOs;
 
-    public WorkSessionListAdapter(Activity activity)
+    public WorkSessionListAdapter(Activity activity, ProgressBar progressBar)
     {
         this.activity = activity;
 
@@ -48,10 +49,10 @@ public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionView
         sharedPreferences = activity.getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         workSessionDTOs = new ArrayList<>();
 
-        retrieveWorkSessions();
+        retrieveWorkSessions(progressBar);
     }
 
-    private void retrieveWorkSessions()
+    private void retrieveWorkSessions(ProgressBar progressBar)
     {
         Request request = new Request.Builder()
                 .get()
@@ -80,7 +81,11 @@ public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionView
 
                     workSessionDTOs = gson.fromJson(response.body().string(), listOfWorkSessionDTOsType);
 
-                    activity.runOnUiThread(() -> notifyDataSetChanged());
+                    activity.runOnUiThread(() ->
+                    {
+                        notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+                    });
 
                     response.close();
                 }
