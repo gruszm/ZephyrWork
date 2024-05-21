@@ -170,7 +170,12 @@ public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionView
         WorkSessionDTO workSessionDTO = workSessionDTOs.get(position);
 
         String startTime = "Start: " + LocalDateTime.parse(workSessionDTO.getStartTime()).format(formatter).toString();
-        String endTime = "End: " + LocalDateTime.parse(workSessionDTO.getEndTime()).format(formatter).toString();
+        String endTime = "";
+
+        if (workSessionDTO.getEndTime() != null)
+        {
+            endTime = "End: " + LocalDateTime.parse(workSessionDTO.getEndTime()).format(formatter).toString();
+        }
 
         holder.setWorkSessionId(workSessionDTO.getId());
         holder.firstNameAndLastNameTv.setText(workSessionDTO.getEmployeeName());
