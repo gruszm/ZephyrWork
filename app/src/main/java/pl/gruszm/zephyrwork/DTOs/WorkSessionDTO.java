@@ -1,11 +1,14 @@
 package pl.gruszm.zephyrwork.DTOs;
 
+import pl.gruszm.zephyrwork.enums.WorkSessionState;
+
 public class WorkSessionDTO
 {
     private int id;
     private String startTime;
     private String endTime;
     private String employeeName;
+    private WorkSessionState workSessionState;
 
     public int getId()
     {
@@ -51,6 +54,18 @@ public class WorkSessionDTO
     public WorkSessionDTO setEmployeeName(String employeeName)
     {
         this.employeeName = employeeName;
+
+        return this;
+    }
+
+    public WorkSessionState getWorkSessionState()
+    {
+        return workSessionState;
+    }
+
+    public WorkSessionDTO setWorkSessionState(WorkSessionState workSessionState)
+    {
+        this.workSessionState = workSessionState;
 
         return this;
     }

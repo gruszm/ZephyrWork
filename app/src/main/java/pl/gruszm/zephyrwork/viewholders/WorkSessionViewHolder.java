@@ -12,7 +12,7 @@ import pl.gruszm.zephyrwork.R;
 public class WorkSessionViewHolder extends RecyclerView.ViewHolder
 {
     private int workSessionId;
-    public TextView firstNameAndLastNameTv, startingDateTv, endingDateTv;
+    public TextView firstNameAndLastNameTv, startingDateTv, endingDateTv, state;
     private Button detailsBtn;
 
     public WorkSessionViewHolder(@NonNull View itemView)
@@ -23,6 +23,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
         startingDateTv = itemView.findViewById(R.id.starting_date);
         endingDateTv = itemView.findViewById(R.id.ending_date);
         detailsBtn = itemView.findViewById(R.id.details);
+        state = itemView.findViewById(R.id.state);
     }
 
     public void setWorkSessionId(int workSessionId)
