@@ -3,16 +3,20 @@ package pl.gruszm.zephyrwork.DTOs;
 public class WorkSessionDTO
 {
     private int id;
-    private String startTime, endTime;
+    private String startTime;
+    private String endTime;
+    private String employeeName;
 
     public int getId()
     {
         return id;
     }
 
-    public void setId(int id)
+    public WorkSessionDTO setId(int id)
     {
         this.id = id;
+
+        return this;
     }
 
     public String getStartTime()
@@ -20,9 +24,11 @@ public class WorkSessionDTO
         return startTime;
     }
 
-    public void setStartTime(String startTime)
+    public WorkSessionDTO setStartTime(String startTime)
     {
         this.startTime = startTime;
+
+        return this;
     }
 
     public String getEndTime()
@@ -30,8 +36,22 @@ public class WorkSessionDTO
         return endTime;
     }
 
-    public void setEndTime(String endTime)
+    public WorkSessionDTO setEndTime(String endTime)
     {
         this.endTime = endTime;
+
+        return this;
+    }
+
+    public String getEmployeeName()
+    {
+        return employeeName;
+    }
+
+    public WorkSessionDTO setEmployeeName(String employeeName)
+    {
+        this.employeeName = employeeName;
+
+        return this;
     }
 }

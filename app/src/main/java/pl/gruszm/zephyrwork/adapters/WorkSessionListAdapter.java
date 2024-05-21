@@ -16,6 +16,8 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +38,7 @@ public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionView
     private Gson gson;
     private OkHttpClient okHttpClient;
     private SharedPreferences sharedPreferences;
+    private DateTimeFormatter formatter;
 
     // List of work sessions
     private List<WorkSessionDTO> workSessionDTOs;
@@ -48,6 +51,7 @@ public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionView
         okHttpClient = new OkHttpClient();
         sharedPreferences = activity.getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         workSessionDTOs = new ArrayList<>();
+        formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
         retrieveWorkSessions(progressBar);
     }
@@ -108,9 +112,13 @@ public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionView
     {
         WorkSessionDTO workSessionDTO = workSessionDTOs.get(position);
 
+        String startTime = "Start: " + LocalDateTime.parse(workSessionDTO.getStartTime()).format(formatter).toString();
+        String endTime = "End: " + LocalDateTime.parse(workSessionDTO.getEndTime()).format(formatter).toString();
+
         holder.setWorkSessionId(workSessionDTO.getId());
-        holder.startingDateTv.setText(workSessionDTO.getStartTime());
-        holder.endingDateTv.setText(workSessionDTO.getEndTime());
+        holder.firstNameAndLastNameTv.setText(workSessionDTO.getEmployeeName());
+        holder.startingDateTv.setText(startTime);
+        holder.endingDateTv.setText(endTime);
     }
 
     @Override
