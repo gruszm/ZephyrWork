@@ -1,14 +1,19 @@
 package pl.gruszm.zephyrwork.adapters;
 
+import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
+
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,6 +36,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.WorkSessionDTO;
 import pl.gruszm.zephyrwork.R;
+import pl.gruszm.zephyrwork.activities.LoginActivity;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.WorkSessionState;
 import pl.gruszm.zephyrwork.viewholders.WorkSessionViewHolder;
@@ -97,7 +103,12 @@ public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionView
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
+                activity.runOnUiThread(() ->
+                {
+                    Toast.makeText(activity, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
 
+                    activity.finish();
+                });
             }
 
             @Override
@@ -118,6 +129,26 @@ public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionView
                     });
 
                     response.close();
+                }
+                else if (response.code() == 401) // Unauthorized, the token is invalid or missing
+                {
+                    // Show error message and redirect to Login activity
+                    activity.runOnUiThread(() ->
+                    {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+
+                        alertDialogBuilder.setTitle("Error");
+                        alertDialogBuilder.setMessage("Authorization error. Please log in and try again.");
+                        alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
+                        {
+                            Intent intent = new Intent(activity, LoginActivity.class);
+
+                            dialogInterface.dismiss();
+                            activity.finish();
+                            activity.startActivity(intent);
+                        });
+                        alertDialogBuilder.create().show();
+                    });
                 }
             }
         });
