@@ -41,7 +41,7 @@ import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.WorkSessionState;
 import pl.gruszm.zephyrwork.viewholders.WorkSessionViewHolder;
 
-public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionViewHolder>
+public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewHolder>
 {
     // Common
     private Activity activity;
@@ -50,14 +50,14 @@ public class WorkSessionListAdapter extends RecyclerView.Adapter<WorkSessionView
     private SharedPreferences sharedPreferences;
     private DateTimeFormatter formatter;
 
-    // List of work sessions
+    // List of Work Sessions
     private List<WorkSessionDTO> workSessionDTOs;
 
     // Work Session State Display
     private Map<WorkSessionState, String> workSessionNames;
     private Map<WorkSessionState, Integer> workSessionColors;
 
-    public WorkSessionListAdapter(Activity activity, ProgressBar progressBar)
+    public MyWorkSessionsAdapter(Activity activity, ProgressBar progressBar)
     {
         this.activity = activity;
 

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import pl.gruszm.zephyrwork.R;
-import pl.gruszm.zephyrwork.adapters.WorkSessionListAdapter;
+import pl.gruszm.zephyrwork.adapters.MyWorkSessionsAdapter;
 
 public class MyWorkSessionsActivity extends AppCompatActivity
 {
@@ -25,6 +25,6 @@ public class MyWorkSessionsActivity extends AppCompatActivity
         progressBar = findViewById(R.id.progress_bar);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new WorkSessionListAdapter(this, progressBar));
+        recyclerView.setAdapter(new MyWorkSessionsAdapter(this, progressBar));
     }
 }
