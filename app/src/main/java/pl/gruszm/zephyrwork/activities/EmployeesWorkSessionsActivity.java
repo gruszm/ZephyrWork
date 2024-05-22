@@ -1,14 +1,19 @@
 package pl.gruszm.zephyrwork.activities;
 
+import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -70,7 +75,12 @@ public class EmployeesWorkSessionsActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
+                runOnUiThread(() ->
+                {
+                    Toast.makeText(EmployeesWorkSessionsActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
 
+                    finish();
+                });
             }
 
             @Override
@@ -91,6 +101,26 @@ public class EmployeesWorkSessionsActivity extends AppCompatActivity
                     });
 
                     response.close();
+                }
+                else if (response.code() == 401) // Unauthorized, the token is invalid or missing
+                {
+                    // Show error message and redirect to Login activity
+                    runOnUiThread(() ->
+                    {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(EmployeesWorkSessionsActivity.this);
+
+                        alertDialogBuilder.setTitle("Error");
+                        alertDialogBuilder.setMessage("Authorization error. Please log in and try again.");
+                        alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
+                        {
+                            Intent intent = new Intent(EmployeesWorkSessionsActivity.this, LoginActivity.class);
+
+                            dialogInterface.dismiss();
+                            finish();
+                            startActivity(intent);
+                        });
+                        alertDialogBuilder.create().show();
+                    });
                 }
             }
         });
