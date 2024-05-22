@@ -138,7 +138,9 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         }
         else if (id == R.id.employees_work_sessions)
         {
+            Intent intent = new Intent(this, EmployeesWorkSessionsActivity.class);
 
+            startActivity(intent);
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

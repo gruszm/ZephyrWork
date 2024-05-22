@@ -269,9 +269,12 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                Toast.makeText(RegisterNewEmployeeActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
+                runOnUiThread(() ->
+                {
+                    Toast.makeText(RegisterNewEmployeeActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
 
-                finish();
+                    finish();
+                });
             }
 
             @Override
