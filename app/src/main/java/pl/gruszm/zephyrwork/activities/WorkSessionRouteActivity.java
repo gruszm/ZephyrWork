@@ -1,11 +1,15 @@
 package pl.gruszm.zephyrwork.activities;
 
+import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
+
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -77,7 +81,12 @@ public class WorkSessionRouteActivity extends AppCompatActivity implements OnMap
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                runOnUiThread(() -> Toast.makeText(WorkSessionRouteActivity.this, "FAILURE", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() ->
+                {
+                    Toast.makeText(WorkSessionRouteActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
+
+                    finish();
+                });
             }
 
             @Override
@@ -97,6 +106,30 @@ public class WorkSessionRouteActivity extends AppCompatActivity implements OnMap
                     runOnUiThread(() -> supportMapFragment.getMapAsync(WorkSessionRouteActivity.this));
 
                     response.close();
+                }
+                else if (response.code() == 401) // Unauthorized, the token is invalid or missing
+                {
+                    // Show error message and redirect to Login activity
+                    runOnUiThread(() ->
+                    {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(WorkSessionRouteActivity.this);
+
+                        alertDialogBuilder.setTitle("Error");
+                        alertDialogBuilder.setMessage("Authorization error. Please log in and try again.");
+                        alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
+                        {
+                            Intent intent = new Intent(WorkSessionRouteActivity.this, LoginActivity.class);
+
+                            dialogInterface.dismiss();
+                            finish();
+                            startActivity(intent);
+                        });
+                        alertDialogBuilder.create().show();
+                    });
+                }
+                else
+                {
+                    runOnUiThread(() -> Toast.makeText(WorkSessionRouteActivity.this, "Error while creating the route. Try again later.", Toast.LENGTH_SHORT).show());
                 }
             }
         });
