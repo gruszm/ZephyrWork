@@ -2,6 +2,7 @@ package pl.gruszm.zephyrwork.viewholders;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import pl.gruszm.zephyrwork.R;
+import pl.gruszm.zephyrwork.activities.WorkSessionRouteActivity;
 import pl.gruszm.zephyrwork.enums.RoleType;
 
 public class WorkSessionViewHolder extends RecyclerView.ViewHolder
@@ -52,7 +54,10 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
 
         alertDialogBuilder.setNeutralButton("VERIFY ON MAP", (DialogInterface var1, int var2) ->
         {
-            Toast.makeText(context, "VERIFY ON MAP", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(context, WorkSessionRouteActivity.class);
+            intent.putExtra("workSessionId", workSessionId);
+
+            context.startActivity(intent);
         });
 
         if (!userRole.equals(RoleType.EMPLOYEE))
