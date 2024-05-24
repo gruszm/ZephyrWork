@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,10 +18,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -44,6 +46,7 @@ public class WorkSessionRouteActivity extends AppCompatActivity implements OnMap
     private SharedPreferences sharedPreferences;
     private List<LatLng> pointsOnMap;
     private SupportMapFragment supportMapFragment;
+    private ClusterManager<ClusterMarker> clusterManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -92,8 +95,6 @@ public class WorkSessionRouteActivity extends AppCompatActivity implements OnMap
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
             {
-                runOnUiThread(() -> Toast.makeText(WorkSessionRouteActivity.this, String.valueOf(response.code()), Toast.LENGTH_SHORT).show());
-
                 if (response.isSuccessful())
                 {
                     Type locationsListType = new TypeToken<List<LocationDTO>>()
@@ -144,32 +145,90 @@ public class WorkSessionRouteActivity extends AppCompatActivity implements OnMap
             return;
         }
 
-        // Create markers
-        List<MarkerOptions> markersList = pointsOnMap.stream().map(p -> new MarkerOptions().position(p)).collect(Collectors.toList());
+        // Initialize the cluster manager
+        clusterManager = new ClusterManager<>(this, googleMap);
+        googleMap.setOnCameraIdleListener(clusterManager);
+        googleMap.setOnMarkerClickListener(clusterManager);
+
+        // Add items to the cluster manager
+        List<ClusterMarker> clusterMarkers = pointsOnMap.stream().map(point -> new ClusterMarker(point.latitude, point.longitude)).collect(Collectors.toList());
+        clusterMarkers.get(0).setTitle("START");
+
+        // Only set the last marker's title, if there are at least 2 markers
+        if (clusterMarkers.size() > 1)
+        {
+            clusterMarkers.get(clusterMarkers.size() - 1).setTitle("END");
+        }
+
+        clusterManager.addItems(clusterMarkers);
+        clusterManager.cluster();
 
         // Create polyline
         PolylineOptions polylineOptions = new PolylineOptions()
                 .width(5)
                 .color(Color.RED);
 
-        markersList.forEach(m -> polylineOptions.add(m.getPosition()));
-
-        // Set the first marker's title
-        markersList.get(0).title("START");
-
-        // Only set the last marker's title, if there are 2 or more
-        if (markersList.size() > 1)
-        {
-            markersList.get(markersList.size() - 1).title("END");
-        }
-
-        // Add markers to map
-        markersList.forEach(m -> googleMap.addMarker(m));
+        pointsOnMap.forEach(point -> polylineOptions.add(point));
 
         // Add polyline to map
         googleMap.addPolyline(polylineOptions);
 
         // Move the camera to the first point
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pointsOnMap.get(0), 10));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pointsOnMap.get(0), 11));
+    }
+
+    private static class ClusterMarker implements ClusterItem
+    {
+        private LatLng position;
+        private String title;
+        private String snippet;
+
+        public ClusterMarker(double latitude, double longitude)
+        {
+            this.position = new LatLng(latitude, longitude);
+        }
+
+        public void setPosition(LatLng position)
+        {
+            this.position = position;
+        }
+
+        public void setTitle(String title)
+        {
+            this.title = title;
+        }
+
+        public void setSnippet(String snippet)
+        {
+            this.snippet = snippet;
+        }
+
+        @NonNull
+        @Override
+        public LatLng getPosition()
+        {
+            return position;
+        }
+
+        @Nullable
+        @Override
+        public String getTitle()
+        {
+            return title;
+        }
+
+        @Nullable
+        @Override
+        public String getSnippet()
+        {
+            return snippet;
+        }
+
+        @Nullable
+        @Override
+        public Float getZIndex()
+        {
+            return null;
+        }
     }
 }
