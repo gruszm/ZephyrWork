@@ -133,12 +133,14 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
         if (id == R.id.my_work_sessions)
         {
             Intent intent = new Intent(this, MyWorkSessionsActivity.class);
+            intent.putExtra("role", userRole);
 
             startActivity(intent);
         }
         else if (id == R.id.employees_work_sessions)
         {
             Intent intent = new Intent(this, EmployeesWorkSessionsActivity.class);
+            intent.putExtra("role", userRole);
 
             startActivity(intent);
         }

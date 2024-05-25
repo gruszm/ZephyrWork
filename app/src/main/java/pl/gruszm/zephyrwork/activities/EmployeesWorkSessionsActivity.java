@@ -1,6 +1,7 @@
 package pl.gruszm.zephyrwork.activities;
 
 import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
+import static pl.gruszm.zephyrwork.enums.RoleType.EMPLOYEE;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -32,11 +34,15 @@ import pl.gruszm.zephyrwork.DTOs.WorkSessionDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.adapters.EmployeesWorkSessionsAdapter;
 import pl.gruszm.zephyrwork.config.AppConfig;
+import pl.gruszm.zephyrwork.enums.RoleType;
+import pl.gruszm.zephyrwork.enums.WorkSessionState;
 
+// TODO: Rename to something like "Work Sessions for Review"
 public class EmployeesWorkSessionsActivity extends AppCompatActivity
 {
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    private RoleType role;
 
     private Gson gson;
     private OkHttpClient okHttpClient;
@@ -47,6 +53,13 @@ public class EmployeesWorkSessionsActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employees_work_sessions);
+
+        if (savedInstanceState == null)
+        {
+            Bundle extras = getIntent().getExtras();
+
+            role = RoleType.valueOf(extras.getString("role", EMPLOYEE.name()));
+        }
 
         recyclerView = findViewById(R.id.recycler_view);
         progressBar = findViewById(R.id.progress_bar);
@@ -93,10 +106,11 @@ public class EmployeesWorkSessionsActivity extends AppCompatActivity
                     }.getType();
 
                     List<WorkSessionDTO> workSessionDTOs = gson.fromJson(response.body().string(), listOfWorkSessionDTOsType);
+                    List<WorkSessionDTO> workSessionDTOsUnderReview = workSessionDTOs.stream().filter(ws -> ws.getWorkSessionState().equals(WorkSessionState.UNDER_REVIEW)).collect(Collectors.toList());
 
                     runOnUiThread(() ->
                     {
-                        recyclerView.setAdapter(new EmployeesWorkSessionsAdapter(EmployeesWorkSessionsActivity.this, workSessionDTOs));
+                        recyclerView.setAdapter(new EmployeesWorkSessionsAdapter(EmployeesWorkSessionsActivity.this, workSessionDTOsUnderReview, role));
                         progressBar.setVisibility(View.GONE);
                     });
 

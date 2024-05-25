@@ -17,6 +17,7 @@ import java.util.Map;
 
 import pl.gruszm.zephyrwork.DTOs.WorkSessionDTO;
 import pl.gruszm.zephyrwork.R;
+import pl.gruszm.zephyrwork.enums.RoleType;
 import pl.gruszm.zephyrwork.enums.WorkSessionState;
 import pl.gruszm.zephyrwork.viewholders.WorkSessionViewHolder;
 
@@ -25,6 +26,7 @@ public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessi
     // Common
     private Activity activity;
     private DateTimeFormatter formatter;
+    private RoleType role;
 
     // List of Work Sessions
     private List<WorkSessionDTO> workSessionDTOs;
@@ -33,10 +35,11 @@ public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessi
     private Map<WorkSessionState, String> workSessionNames;
     private Map<WorkSessionState, Integer> workSessionColors;
 
-    public EmployeesWorkSessionsAdapter(Activity activity, List<WorkSessionDTO> workSessionDTOs)
+    public EmployeesWorkSessionsAdapter(Activity activity, List<WorkSessionDTO> workSessionDTOs, RoleType role)
     {
         this.activity = activity;
         this.workSessionDTOs = workSessionDTOs;
+        this.role = role;
 
         // Work Session State Display
         workSessionNames = new HashMap<>();
@@ -81,6 +84,8 @@ public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessi
             endTime = "End: " + LocalDateTime.parse(workSessionDTO.getEndTime()).format(formatter).toString();
         }
 
+        holder.setContext(activity);
+        holder.setUserRole(role);
         holder.setWorkSessionId(workSessionDTO.getId());
         holder.firstNameAndLastNameTv.setText(workSessionDTO.getEmployeeName());
         holder.startingDateTv.setText(startTime);
