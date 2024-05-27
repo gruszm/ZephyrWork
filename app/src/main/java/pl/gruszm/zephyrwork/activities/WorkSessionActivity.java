@@ -47,8 +47,9 @@ import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.RoleType;
+import pl.gruszm.zephyrwork.services.LocationSenderService;
 
-public class WorkSessionActivity extends AppCompatActivity implements LocationListener, NavigationView.OnNavigationItemSelectedListener
+public class WorkSessionActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
     // Constants
     private static final int LOCATION_TRACKING_DELAY_MS = 5000;
@@ -282,20 +283,15 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
                 callLock = false;
             }
 
-            // Suppressed, because permission is checked at the beginning of the function
-            @SuppressLint("MissingPermission")
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
             {
                 if (response.isSuccessful())
                 {
                     // Start the location tracking
-                    WorkSessionActivity.this.fusedLocationProviderClient.requestLocationUpdates(
-                            new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_TRACKING_DELAY_MS).build(),
-                            WorkSessionActivity.this,
-                            Looper.getMainLooper()
-                    );
+                    Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
 
+                    startService(locationSenderService);
                     response.close();
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
@@ -351,8 +347,10 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
             {
                 if (response.isSuccessful())
                 {
-                    fusedLocationProviderClient.removeLocationUpdates(WorkSessionActivity.this);
+                    // Stop the location tracking
+                    Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
 
+                    stopService(locationSenderService);
                     response.close();
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
@@ -371,67 +369,6 @@ public class WorkSessionActivity extends AppCompatActivity implements LocationLi
                 }
 
                 callLock = false;
-            }
-        });
-    }
-
-    @Override
-    public void onLocationChanged(@NonNull Location location)
-    {
-        String jwt = sharedPreferences.getString("Auth", "");
-        LocationDTO locationDTO = new LocationDTO(LocalDateTime.now().toString(), location.getLatitude(), location.getLongitude());
-        RequestBody requestBody = RequestBody.create(gson.toJson(locationDTO), MediaType.get("application/json"));
-
-        Request request = new Request.Builder()
-                .url(AppConfig.BACKEND_BASE.concat("/locations/token"))
-                .post(requestBody)
-                .header("Auth", jwt)
-                .build();
-
-        okHttpClient.newCall(request).enqueue(new Callback()
-        {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e)
-            {
-                runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "Connection error. The locations are still being saved in offline mode and will be synchronized when possible.", Toast.LENGTH_SHORT).show());
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
-            {
-                if (response.isSuccessful())
-                {
-                    runOnUiThread(() ->
-                    {
-                        Toast.makeText(WorkSessionActivity.this, "Your location has been saved for the active work session.", Toast.LENGTH_SHORT).show();
-                    });
-
-                    response.close();
-                }
-                else if (response.code() == 400)
-                {
-                    runOnUiThread(() ->
-                    {
-                        Toast.makeText(WorkSessionActivity.this, "You do not have an active work session." +
-                                " Locations tracking has been turned off.", Toast.LENGTH_SHORT).show();
-                    });
-
-                    fusedLocationProviderClient.removeLocationUpdates(WorkSessionActivity.this);
-                }
-                else if (response.code() == 401) // Unauthorized, the token is invalid or missing
-                {
-                    runOnUiThread(() ->
-                    {
-                        Intent intent = new Intent(WorkSessionActivity.this, LoginActivity.class);
-
-                        // Show error message and redirect to Login activity
-                        Toast.makeText(WorkSessionActivity.this, "Authorization error. The locations are still being saved in offline mode and will be synchronized once you log in.", Toast.LENGTH_SHORT).show();
-                        finish();
-                        startActivity(intent);
-
-                        // TODO: Add the location to a list for a later synchronization.
-                    });
-                }
             }
         });
     }
