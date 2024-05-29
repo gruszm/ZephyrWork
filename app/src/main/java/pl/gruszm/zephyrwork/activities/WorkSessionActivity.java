@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -51,14 +52,10 @@ import pl.gruszm.zephyrwork.services.LocationSenderService;
 
 public class WorkSessionActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
-    // Constants
-    private static final int LOCATION_TRACKING_DELAY_MS = 5000;
-
     // Common
     private OkHttpClient okHttpClient;
     private Gson gson;
     private SharedPreferences sharedPreferences;
-    private FusedLocationProviderClient fusedLocationProviderClient;
     private boolean callLock;
 
     // Buttons
@@ -86,7 +83,6 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
         okHttpClient = new OkHttpClient();
         gson = new Gson();
         sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         callLock = false;
 
         // Layout
@@ -262,6 +258,7 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
             return;
         }
 
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(WorkSessionActivity.this);
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
@@ -292,16 +289,32 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
                     Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
 
                     startService(locationSenderService);
+
+                    runOnUiThread(() ->
+                    {
+                        alertDialogBuilder.setTitle("Info");
+                        alertDialogBuilder.setMessage("The work session has been started.");
+                        alertDialogBuilder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+                        alertDialogBuilder.create().show();
+                    });
+
                     response.close();
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
                     runOnUiThread(() ->
                     {
-                        Intent intent = new Intent(WorkSessionActivity.this, LoginActivity.class);
+                        alertDialogBuilder.setTitle("Error");
+                        alertDialogBuilder.setMessage("Authorization error. Please log in and try again.");
+                        alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
+                        {
+                            Intent intent = new Intent(WorkSessionActivity.this, LoginActivity.class);
 
-                        finish();
-                        startActivity(intent);
+                            dialogInterface.dismiss();
+                            finish();
+                            startActivity(intent);
+                        });
+                        alertDialogBuilder.create().show();
                     });
                 }
                 else if (response.code() == 400) // Bad Request, the user already has an active Work Session
@@ -321,6 +334,7 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
             return;
         }
 
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(WorkSessionActivity.this);
         String jwt = sharedPreferences.getString("Auth", "");
 
         Request request = new Request.Builder()
@@ -351,16 +365,32 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
                     Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
 
                     stopService(locationSenderService);
+
+                    runOnUiThread(() ->
+                    {
+                        alertDialogBuilder.setTitle("Info");
+                        alertDialogBuilder.setMessage("The work session has been stopped.");
+                        alertDialogBuilder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+                        alertDialogBuilder.create().show();
+                    });
+
                     response.close();
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
                     runOnUiThread(() ->
                     {
-                        Intent intent = new Intent(WorkSessionActivity.this, LoginActivity.class);
+                        alertDialogBuilder.setTitle("Error");
+                        alertDialogBuilder.setMessage("Authorization error. Please log in and try again.");
+                        alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
+                        {
+                            Intent intent = new Intent(WorkSessionActivity.this, LoginActivity.class);
 
-                        finish();
-                        startActivity(intent);
+                            dialogInterface.dismiss();
+                            finish();
+                            startActivity(intent);
+                        });
+                        alertDialogBuilder.create().show();
                     });
                 }
                 else if (response.code() == 400) // Bad Request, the user does not have an active Work Session
