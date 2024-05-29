@@ -38,14 +38,13 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.LocationDTO;
 import pl.gruszm.zephyrwork.R;
-import pl.gruszm.zephyrwork.activities.LoginActivity;
 import pl.gruszm.zephyrwork.activities.WorkSessionActivity;
 import pl.gruszm.zephyrwork.config.AppConfig;
 
 public class LocationSenderService extends Service implements LocationListener
 {
     private static final int LOCATION_TRACKING_DELAY_MS = 5000;
-    private static final String CHANNEL_ID = "LocationServiceChannel";
+    private static final String CHANNEL_ID = "ZephyrWorkLocationServiceChannel";
     private OkHttpClient okHttpClient;
     private Gson gson;
     private SharedPreferences sharedPreferences;
@@ -99,7 +98,7 @@ public class LocationSenderService extends Service implements LocationListener
         {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
-                    "Foreground Service Channel",
+                    CHANNEL_ID,
                     NotificationManager.IMPORTANCE_DEFAULT
             );
 
@@ -118,8 +117,8 @@ public class LocationSenderService extends Service implements LocationListener
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Foreground Service")
-                .setContentText("Running in the foreground")
+                .setContentTitle("ZephyrWork")
+                .setContentText("Sending Your locations for the active work session")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentIntent(pendingIntent)
                 .build();
@@ -142,7 +141,7 @@ public class LocationSenderService extends Service implements LocationListener
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e)
             {
-                showToast("Connection error. The locations are still being saved in offline mode and will be synchronized when possible.");
+                showToast(AppConfig.CONNECTION_ERROR_STANDARD_MSG);
             }
 
             @Override
@@ -156,17 +155,14 @@ public class LocationSenderService extends Service implements LocationListener
                 }
                 else if (response.code() == 400)
                 {
-                    showToast("You do not have an active work session. Locations tracking has been turned off.");
+                    Intent intent = new Intent(LocationSenderService.this, LocationSenderService.class);
 
-                    fusedLocationProviderClient.removeLocationUpdates(LocationSenderService.this);
+                    showToast("You do not have an active work session. Locations tracking has been turned off.");
+                    stopService(intent);
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
-                    Intent intent = new Intent(LocationSenderService.this, LoginActivity.class);
-
-                    // Show error message and redirect to Login activity
-                    showToast("Authorization error.");
-                    startActivity(intent);
+                    showToast("Authorization error. The location could be sent. Please log in to resume location sending.");
                 }
             }
         });
