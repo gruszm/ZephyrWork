@@ -64,7 +64,7 @@ public class LocationSenderService extends Service implements LocationListener
         startForeground(1, getNotification());
     }
 
-    // Suppressed, because permission is checked in the method, which start the service
+    // Suppressed, because permission is checked in the method, which starts the service
     @SuppressLint("MissingPermission")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
