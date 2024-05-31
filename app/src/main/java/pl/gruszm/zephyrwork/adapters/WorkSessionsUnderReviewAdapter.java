@@ -14,9 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import pl.gruszm.zephyrwork.DTOs.WorkSessionDTO;
 import pl.gruszm.zephyrwork.R;
@@ -25,7 +23,7 @@ import pl.gruszm.zephyrwork.enums.RoleType;
 import pl.gruszm.zephyrwork.enums.WorkSessionState;
 import pl.gruszm.zephyrwork.viewholders.WorkSessionViewHolder;
 
-public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewHolder> implements OnWorkSessionUpdateCallback
+public class WorkSessionsUnderReviewAdapter extends RecyclerView.Adapter<WorkSessionViewHolder> implements OnWorkSessionUpdateCallback
 {
     // Common
     private Activity activity;
@@ -39,7 +37,7 @@ public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessi
     private Map<WorkSessionState, String> workSessionNames;
     private Map<WorkSessionState, Integer> workSessionColors;
 
-    public EmployeesWorkSessionsAdapter(Activity activity, List<WorkSessionDTO> workSessionDTOs, RoleType role)
+    public WorkSessionsUnderReviewAdapter(Activity activity, List<WorkSessionDTO> workSessionDTOs, RoleType role)
     {
         this.activity = activity;
         this.workSessionDTOs = workSessionDTOs;

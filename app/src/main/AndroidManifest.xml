@@ -27,7 +27,7 @@
             android:name=".activities.WorkSessionRouteActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.EmployeesWorkSessionsActivity"
+            android:name=".activities.WorkSessionsUnderReviewActivity"
             android:exported="false" />
         <activity
             android:name=".activities.MyWorkSessionsActivity"

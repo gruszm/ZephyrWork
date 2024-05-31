@@ -32,13 +32,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.WorkSessionDTO;
 import pl.gruszm.zephyrwork.R;
-import pl.gruszm.zephyrwork.adapters.EmployeesWorkSessionsAdapter;
+import pl.gruszm.zephyrwork.adapters.WorkSessionsUnderReviewAdapter;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.RoleType;
 import pl.gruszm.zephyrwork.enums.WorkSessionState;
 
-// TODO: Rename to something like "Work Sessions for Review"
-public class EmployeesWorkSessionsActivity extends AppCompatActivity
+public class WorkSessionsUnderReviewActivity extends AppCompatActivity
 {
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
@@ -90,7 +89,7 @@ public class EmployeesWorkSessionsActivity extends AppCompatActivity
             {
                 runOnUiThread(() ->
                 {
-                    Toast.makeText(EmployeesWorkSessionsActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WorkSessionsUnderReviewActivity.this, CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show();
 
                     finish();
                 });
@@ -110,7 +109,7 @@ public class EmployeesWorkSessionsActivity extends AppCompatActivity
 
                     runOnUiThread(() ->
                     {
-                        recyclerView.setAdapter(new EmployeesWorkSessionsAdapter(EmployeesWorkSessionsActivity.this, workSessionDTOsUnderReview, role));
+                        recyclerView.setAdapter(new WorkSessionsUnderReviewAdapter(WorkSessionsUnderReviewActivity.this, workSessionDTOsUnderReview, role));
                         progressBar.setVisibility(View.GONE);
                     });
 
@@ -121,13 +120,13 @@ public class EmployeesWorkSessionsActivity extends AppCompatActivity
                     // Show error message and redirect to Login activity
                     runOnUiThread(() ->
                     {
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(EmployeesWorkSessionsActivity.this);
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(WorkSessionsUnderReviewActivity.this);
 
                         alertDialogBuilder.setTitle("Error");
                         alertDialogBuilder.setMessage("Authorization error. Please log in and try again.");
                         alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
                         {
-                            Intent intent = new Intent(EmployeesWorkSessionsActivity.this, LoginActivity.class);
+                            Intent intent = new Intent(WorkSessionsUnderReviewActivity.this, LoginActivity.class);
 
                             dialogInterface.dismiss();
                             finish();
