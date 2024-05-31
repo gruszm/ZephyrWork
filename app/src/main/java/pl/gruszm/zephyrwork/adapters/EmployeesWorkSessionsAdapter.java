@@ -111,7 +111,7 @@ public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessi
     }
 
     @Override
-    public void updateWorkSession(int workSessionId)
+    public void removeWorkSession(int workSessionId)
     {
         List<WorkSessionDTO> workSessionToRemove = workSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
 

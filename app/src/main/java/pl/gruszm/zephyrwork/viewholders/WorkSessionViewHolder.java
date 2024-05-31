@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -119,6 +120,8 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
         alertDialogBuilder.setPositiveButton("OK", (dialog, which) ->
         {
             dialog.dismiss();
+
+            returnWorkSession(editText.getText().toString());
         });
 
         alertDialogBuilder.setNeutralButton("CANCEL", (dialog, which) ->
@@ -127,6 +130,70 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
         });
 
         alertDialogBuilder.create().show();
+    }
+
+    private void returnWorkSession(String reason)
+    {
+        RequestBody requestBody = RequestBody.create(
+                reason,
+                MediaType.get("text/plain; charset=utf-8")
+        );
+
+        StringBuilder urlBuilder = new StringBuilder()
+                .append(AppConfig.BACKEND_BASE)
+                .append("/worksessions/return/")
+                .append(workSessionId);
+
+        Request request = new Request.Builder()
+                .post(requestBody)
+                .url(urlBuilder.toString())
+                .header("Auth", sharedPreferences.getString("Auth", ""))
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+
+        call.enqueue(new Callback()
+        {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e)
+            {
+                activity.runOnUiThread(() -> Toast.makeText(activity, AppConfig.CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+            {
+                if (response.isSuccessful())
+                {
+                    activity.runOnUiThread(() -> Toast.makeText(activity, "Work session returned.", Toast.LENGTH_SHORT).show());
+                    onWorkSessionUpdateCallback.removeWorkSession(workSessionId);
+                }
+                else if (response.code() == 401) // Unauthorized, the token is invalid or missing
+                {
+                    // Show error message and redirect to Login activity
+                    activity.runOnUiThread(() ->
+                    {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+
+                        alertDialogBuilder.setTitle("Error");
+                        alertDialogBuilder.setMessage("Authorization error. Please log in and try again.");
+                        alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
+                        {
+                            Intent intent = new Intent(activity, LoginActivity.class);
+
+                            dialogInterface.dismiss();
+                            activity.finish();
+                            activity.startActivity(intent);
+                        });
+                        alertDialogBuilder.create().show();
+                    });
+                }
+                else
+                {
+                    activity.runOnUiThread(() -> Toast.makeText(activity, "Unknown error occurred. Please try again.", Toast.LENGTH_SHORT).show());
+                }
+            }
+        });
     }
 
     private void approveWorkSession(DialogInterface dialogInterface)
@@ -161,7 +228,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
                 {
                     activity.runOnUiThread(() -> Toast.makeText(activity, "Work session approved successfully.", Toast.LENGTH_SHORT).show());
                     dialogInterface.dismiss();
-                    onWorkSessionUpdateCallback.updateWorkSession(workSessionId);
+                    onWorkSessionUpdateCallback.removeWorkSession(workSessionId);
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
