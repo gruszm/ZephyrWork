@@ -7,7 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +29,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.activities.LoginActivity;
-import pl.gruszm.zephyrwork.activities.RegisterNewEmployeeActivity;
 import pl.gruszm.zephyrwork.activities.WorkSessionRouteActivity;
 import pl.gruszm.zephyrwork.callbacks.OnWorkSessionUpdateCallback;
 import pl.gruszm.zephyrwork.config.AppConfig;
@@ -86,15 +87,44 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
 
         if (!userRole.equals(RoleType.EMPLOYEE))
         {
-            alertDialogBuilder.setNegativeButton("RETURN", (DialogInterface var1, int var2) ->
+            alertDialogBuilder.setNegativeButton("RETURN", (DialogInterface dialog, int var2) ->
             {
-                Toast.makeText(activity, "RETURN", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+                showReturnReasonDialog();
             });
-            alertDialogBuilder.setPositiveButton("APPROVE", (DialogInterface var1, int var2) ->
+            alertDialogBuilder.setPositiveButton("APPROVE", (DialogInterface dialog, int var2) ->
             {
-                approveWorkSession(var1);
+                approveWorkSession(dialog);
             });
         }
+
+        alertDialogBuilder.create().show();
+    }
+
+    private void showReturnReasonDialog()
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+
+        alertDialogBuilder.setTitle("Reason");
+
+        // Create EditText
+        EditText editText = new EditText(activity);
+        editText.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
+        editText.setMinLines(3);
+        editText.setSingleLine(false);
+        editText.setHorizontallyScrolling(false);
+        editText.setPadding(40, editText.getPaddingTop(), 40, editText.getPaddingBottom());
+        alertDialogBuilder.setView(editText);
+
+        alertDialogBuilder.setPositiveButton("OK", (dialog, which) ->
+        {
+            dialog.dismiss();
+        });
+
+        alertDialogBuilder.setNeutralButton("CANCEL", (dialog, which) ->
+        {
+            dialog.dismiss();
+        });
 
         alertDialogBuilder.create().show();
     }
