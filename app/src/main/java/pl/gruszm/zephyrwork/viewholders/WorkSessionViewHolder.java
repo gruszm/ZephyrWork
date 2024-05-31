@@ -46,6 +46,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
     public TextView firstNameAndLastNameTv, startingDateTv, endingDateTv, state;
     private Button detailsBtn;
     private OnWorkSessionUpdateCallback onWorkSessionUpdateCallback;
+    private boolean isUnderReviewActivity = false;
 
     public WorkSessionViewHolder(@NonNull View itemView)
     {
@@ -86,7 +87,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
             activity.startActivity(intent);
         });
 
-        if (!userRole.equals(RoleType.EMPLOYEE))
+        if (!userRole.equals(RoleType.EMPLOYEE) && (isUnderReviewActivity))
         {
             alertDialogBuilder.setNegativeButton("RETURN", (DialogInterface dialog, int var2) ->
             {
@@ -280,5 +281,10 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
     public void setOnWorkSessionUpdateCallback(OnWorkSessionUpdateCallback onWorkSessionUpdateCallback)
     {
         this.onWorkSessionUpdateCallback = onWorkSessionUpdateCallback;
+    }
+
+    public void setUnderReviewActivity(boolean underReviewActivity)
+    {
+        isUnderReviewActivity = underReviewActivity;
     }
 }

@@ -88,6 +88,7 @@ public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessi
             endTime = "End: " + LocalDateTime.parse(workSessionDTO.getEndTime()).format(formatter).toString();
         }
 
+        holder.setUnderReviewActivity(true);
         holder.setOnWorkSessionUpdateCallback(this);
         holder.setActivityAndSharedPreferences(activity);
         holder.setUserRole(role);
