@@ -14,14 +14,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import pl.gruszm.zephyrwork.DTOs.WorkSessionDTO;
 import pl.gruszm.zephyrwork.R;
+import pl.gruszm.zephyrwork.callbacks.OnWorkSessionUpdateCallback;
 import pl.gruszm.zephyrwork.enums.RoleType;
 import pl.gruszm.zephyrwork.enums.WorkSessionState;
 import pl.gruszm.zephyrwork.viewholders.WorkSessionViewHolder;
 
-public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewHolder>
+public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewHolder> implements OnWorkSessionUpdateCallback
 {
     // Common
     private Activity activity;
@@ -84,7 +88,8 @@ public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessi
             endTime = "End: " + LocalDateTime.parse(workSessionDTO.getEndTime()).format(formatter).toString();
         }
 
-        holder.setContext(activity);
+        holder.setOnWorkSessionUpdateCallback(this);
+        holder.setActivityAndSharedPreferences(activity);
         holder.setUserRole(role);
         holder.setWorkSessionId(workSessionDTO.getId());
         holder.firstNameAndLastNameTv.setText(workSessionDTO.getEmployeeName());
@@ -103,5 +108,21 @@ public class EmployeesWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessi
     public void setWorkSessionDTOs(List<WorkSessionDTO> workSessionDTOs)
     {
         this.workSessionDTOs = workSessionDTOs;
+    }
+
+    @Override
+    public void updateWorkSession(int workSessionId)
+    {
+        List<WorkSessionDTO> workSessionToRemove = workSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
+
+        if (workSessionToRemove.size() == 0)
+        {
+            return;
+        }
+
+        int positionToRemove = workSessionDTOs.indexOf(workSessionToRemove.get(0));
+
+        workSessionDTOs.remove(positionToRemove);
+        activity.runOnUiThread(() -> notifyItemRemoved(positionToRemove));
     }
 }

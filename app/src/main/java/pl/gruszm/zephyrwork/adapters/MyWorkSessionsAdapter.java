@@ -180,7 +180,7 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
             endTime = "End: " + LocalDateTime.parse(workSessionDTO.getEndTime()).format(formatter).toString();
         }
 
-        holder.setContext(activity);
+        holder.setActivityAndSharedPreferences(activity);
         holder.setUserRole(role);
         holder.setWorkSessionId(workSessionDTO.getId());
         holder.firstNameAndLastNameTv.setText(workSessionDTO.getEmployeeName());

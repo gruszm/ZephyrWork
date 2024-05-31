@@ -162,7 +162,7 @@ public class LocationSenderService extends Service implements LocationListener
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
-                    showToast("Authorization error. The location could be sent. Please log in to resume location sending.");
+                    showToast("Authorization error. The location could not be sent. Please log in to resume location sending.");
                 }
             }
         });
