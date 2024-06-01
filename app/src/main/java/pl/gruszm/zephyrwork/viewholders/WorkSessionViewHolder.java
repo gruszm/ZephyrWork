@@ -34,6 +34,7 @@ import pl.gruszm.zephyrwork.activities.WorkSessionRouteActivity;
 import pl.gruszm.zephyrwork.callbacks.OnWorkSessionUpdateCallback;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.RoleType;
+import pl.gruszm.zephyrwork.enums.WorkSessionState;
 
 public class WorkSessionViewHolder extends RecyclerView.ViewHolder
 {
@@ -106,7 +107,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
             activity.startActivity(intent);
         });
 
-        if (!userRole.equals(RoleType.EMPLOYEE) && (isUnderReviewActivity))
+        if (isUnderReviewActivity)
         {
             alertDialogBuilder.setNegativeButton("RETURN", (DialogInterface dialog, int var2) ->
             {
@@ -118,8 +119,110 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
                 approveWorkSession(dialog);
             });
         }
+        else
+        {
+            alertDialogBuilder.setPositiveButton("RE-SEND", (dialogInterface, i) ->
+            {
+                dialogInterface.dismiss();
+                showResendDialog();
+            });
+        }
 
         alertDialogBuilder.create().show();
+    }
+
+    private void showResendDialog()
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+
+        alertDialogBuilder.setTitle("Your Answer");
+
+        // Create EditText
+        EditText editText = new EditText(activity);
+        editText.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
+        editText.setMinLines(3);
+        editText.setSingleLine(false);
+        editText.setHorizontallyScrolling(false);
+        editText.setPadding(40, editText.getPaddingTop(), 40, editText.getPaddingBottom());
+        alertDialogBuilder.setView(editText);
+
+        alertDialogBuilder.setPositiveButton("OK", (dialog, which) ->
+        {
+            dialog.dismiss();
+
+            resendWorkSession(editText.getText().toString());
+        });
+
+        alertDialogBuilder.setNeutralButton("CANCEL", (dialog, which) ->
+        {
+            dialog.dismiss();
+        });
+
+        alertDialogBuilder.create().show();
+    }
+
+    private void resendWorkSession(String answer)
+    {
+        RequestBody requestBody = RequestBody.create(
+                answer,
+                MediaType.get("text/plain; charset=utf-8")
+        );
+
+        StringBuilder urlBuilder = new StringBuilder()
+                .append(AppConfig.BACKEND_BASE)
+                .append("/worksessions/resend/")
+                .append(workSessionId);
+
+        Request request = new Request.Builder()
+                .post(requestBody)
+                .url(urlBuilder.toString())
+                .header("Auth", sharedPreferences.getString("Auth", ""))
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+
+        call.enqueue(new Callback()
+        {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e)
+            {
+                activity.runOnUiThread(() -> Toast.makeText(activity, AppConfig.CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+            {
+                if (response.isSuccessful())
+                {
+                    activity.runOnUiThread(() -> Toast.makeText(activity, "Work session re-sent.", Toast.LENGTH_SHORT).show());
+                    onWorkSessionUpdateCallback.updateWorkSessionState(workSessionId, WorkSessionState.UNDER_REVIEW);
+                }
+                else if (response.code() == 401) // Unauthorized, the token is invalid or missing
+                {
+                    // Show error message and redirect to Login activity
+                    activity.runOnUiThread(() ->
+                    {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+
+                        alertDialogBuilder.setTitle("Error");
+                        alertDialogBuilder.setMessage("Authorization error. Please log in and try again.");
+                        alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
+                        {
+                            Intent intent = new Intent(activity, LoginActivity.class);
+
+                            dialogInterface.dismiss();
+                            activity.finish();
+                            activity.startActivity(intent);
+                        });
+                        alertDialogBuilder.create().show();
+                    });
+                }
+                else
+                {
+                    activity.runOnUiThread(() -> Toast.makeText(activity, "Unknown error occurred. Please try again.", Toast.LENGTH_SHORT).show());
+                }
+            }
+        });
     }
 
     private void showReturnReasonDialog()

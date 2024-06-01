@@ -46,4 +46,39 @@ public class WorkSessionDTO
     {
         return notesFromEmployee;
     }
+
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public void setStartTime(String startTime)
+    {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(String endTime)
+    {
+        this.endTime = endTime;
+    }
+
+    public void setEmployeeName(String employeeName)
+    {
+        this.employeeName = employeeName;
+    }
+
+    public void setWorkSessionState(WorkSessionState workSessionState)
+    {
+        this.workSessionState = workSessionState;
+    }
+
+    public void setNotesFromSupervisor(String notesFromSupervisor)
+    {
+        this.notesFromSupervisor = notesFromSupervisor;
+    }
+
+    public void setNotesFromEmployee(String notesFromEmployee)
+    {
+        this.notesFromEmployee = notesFromEmployee;
+    }
 }

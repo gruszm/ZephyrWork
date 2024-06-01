@@ -126,4 +126,20 @@ public class WorkSessionsUnderReviewAdapter extends RecyclerView.Adapter<WorkSes
         workSessionDTOs.remove(positionToRemove);
         activity.runOnUiThread(() -> notifyItemRemoved(positionToRemove));
     }
+
+    @Override
+    public void updateWorkSessionState(int workSessionId, WorkSessionState workSessionState)
+    {
+        List<WorkSessionDTO> workSessionToUpdate = workSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
+
+        if (workSessionToUpdate.size() == 0)
+        {
+            return;
+        }
+
+        int positionToUpdate = workSessionDTOs.indexOf(workSessionToUpdate.get(0));
+
+        workSessionToUpdate.get(0).setWorkSessionState(workSessionState);
+        activity.runOnUiThread(() -> notifyItemChanged(positionToUpdate));
+    }
 }
