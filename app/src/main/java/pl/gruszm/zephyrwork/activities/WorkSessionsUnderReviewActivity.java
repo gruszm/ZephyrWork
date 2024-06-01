@@ -42,7 +42,6 @@ public class WorkSessionsUnderReviewActivity extends AppCompatActivity
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private RoleType role;
-
     private Gson gson;
     private OkHttpClient okHttpClient;
     private SharedPreferences sharedPreferences;

@@ -47,6 +47,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
     private Button detailsBtn;
     private OnWorkSessionUpdateCallback onWorkSessionUpdateCallback;
     private boolean isUnderReviewActivity = false;
+    private String notesFromSupervisor, notesFromEmployee;
 
     public WorkSessionViewHolder(@NonNull View itemView)
     {
@@ -75,6 +76,24 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
                 .append(startingDateTv.getText())
                 .append("\n")
                 .append(endingDateTv.getText());
+
+        if (notesFromSupervisor != null)
+        {
+            stringBuilder
+                    .append("\n\n")
+                    .append("Notes from supervisor:")
+                    .append("\n\n")
+                    .append(notesFromSupervisor);
+        }
+
+        if (notesFromEmployee != null)
+        {
+            stringBuilder
+                    .append("\n\n")
+                    .append("Notes from employee:")
+                    .append("\n\n")
+                    .append(notesFromEmployee);
+        }
 
         alertDialogBuilder.setTitle("Work Session Details");
         alertDialogBuilder.setMessage(stringBuilder.toString());
@@ -286,5 +305,25 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
     public void setUnderReviewActivity(boolean underReviewActivity)
     {
         isUnderReviewActivity = underReviewActivity;
+    }
+
+    public String getNotesFromSupervisor()
+    {
+        return notesFromSupervisor;
+    }
+
+    public void setNotesFromSupervisor(String notesFromSupervisor)
+    {
+        this.notesFromSupervisor = notesFromSupervisor;
+    }
+
+    public String getNotesFromEmployee()
+    {
+        return notesFromEmployee;
+    }
+
+    public void setNotesFromEmployee(String notesFromEmployee)
+    {
+        this.notesFromEmployee = notesFromEmployee;
     }
 }

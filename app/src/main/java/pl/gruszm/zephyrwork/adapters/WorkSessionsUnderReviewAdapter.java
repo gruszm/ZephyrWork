@@ -94,6 +94,8 @@ public class WorkSessionsUnderReviewAdapter extends RecyclerView.Adapter<WorkSes
         holder.firstNameAndLastNameTv.setText(workSessionDTO.getEmployeeName());
         holder.startingDateTv.setText(startTime);
         holder.endingDateTv.setText(endTime);
+        holder.setNotesFromSupervisor(workSessionDTO.getNotesFromSupervisor());
+        holder.setNotesFromEmployee(workSessionDTO.getNotesFromEmployee());
         holder.state.setText(workSessionNames.get(workSessionDTO.getWorkSessionState()));
         holder.state.setTextColor(ContextCompat.getColor(activity, workSessionColors.get(workSessionDTO.getWorkSessionState())));
     }
