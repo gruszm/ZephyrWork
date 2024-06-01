@@ -32,6 +32,7 @@ import pl.gruszm.zephyrwork.activities.WorkSessionRouteActivity;
 import pl.gruszm.zephyrwork.callbacks.OnWorkSessionUpdateCallback;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.WorkSessionState;
+import pl.gruszm.zephyrwork.services.LocationSenderService;
 
 public class WorkSessionViewHolder extends RecyclerView.ViewHolder
 {
@@ -121,11 +122,96 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
                 dialogInterface.dismiss();
                 showResendDialog();
             });
+            alertDialogBuilder.setNegativeButton("CANCEL", (dialogInterface, i) ->
+            {
+                dialogInterface.dismiss();
+                cancelWorkSession();
+            });
         }
-        else if (workSessionState.equals(WorkSessionState.IN_PROGRESS))
+        else if (workSessionState.equals(WorkSessionState.IN_PROGRESS) || workSessionState.equals(WorkSessionState.UNDER_REVIEW))
         {
-
+            alertDialogBuilder.setPositiveButton("CANCEL", (dialogInterface, i) ->
+            {
+                dialogInterface.dismiss();
+                cancelWorkSession();
+            });
         }
+
+        alertDialogBuilder.create().show();
+    }
+
+    private void cancelWorkSession()
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+
+        alertDialogBuilder.setTitle("Warning");
+        alertDialogBuilder.setMessage("Are You sure You want to cancel this work session? This cannot be undone.");
+        alertDialogBuilder.setNegativeButton("NO", (dialogInterface, i) ->
+        {
+            dialogInterface.dismiss();
+        });
+        alertDialogBuilder.setPositiveButton("YES", (dialogInterface, i) ->
+        {
+            dialogInterface.dismiss();
+
+            RequestBody emptyRequestBody = RequestBody.create(new byte[0]);
+
+            Request request = new Request.Builder()
+                    .url(AppConfig.BACKEND_BASE.concat("/worksessions/cancel/").concat(String.valueOf(workSessionId)))
+                    .post(emptyRequestBody)
+                    .header("Auth", sharedPreferences.getString("Auth", ""))
+                    .build();
+
+            Call call = okHttpClient.newCall(request);
+
+            call.enqueue(new Callback()
+            {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e)
+                {
+                    activity.runOnUiThread(() -> Toast.makeText(activity, AppConfig.CONNECTION_ERROR_STANDARD_MSG, Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+                {
+                    if (response.isSuccessful())
+                    {
+                        activity.runOnUiThread(() -> Toast.makeText(activity, "Work session cancelled.", Toast.LENGTH_SHORT).show());
+                        onWorkSessionUpdateCallback.updateWorkSessionState(workSessionId, WorkSessionState.CANCELLED);
+
+                        // Shut down the service
+                        Intent intent = new Intent(activity, LocationSenderService.class);
+
+                        activity.stopService(intent);
+                    }
+                    else if (response.code() == 401) // Unauthorized, the token is invalid or missing
+                    {
+                        // Show error message and redirect to Login activity
+                        activity.runOnUiThread(() ->
+                        {
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+
+                            alertDialogBuilder.setTitle("Error");
+                            alertDialogBuilder.setMessage("Authorization error. Please log in and try again.");
+                            alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) ->
+                            {
+                                Intent intent = new Intent(activity, LoginActivity.class);
+
+                                dialogInterface.dismiss();
+                                activity.finish();
+                                activity.startActivity(intent);
+                            });
+                            alertDialogBuilder.create().show();
+                        });
+                    }
+                    else
+                    {
+                        activity.runOnUiThread(() -> Toast.makeText(activity, "Unknown error occurred. Please try again.", Toast.LENGTH_SHORT).show());
+                    }
+                }
+            });
+        });
 
         alertDialogBuilder.create().show();
     }
