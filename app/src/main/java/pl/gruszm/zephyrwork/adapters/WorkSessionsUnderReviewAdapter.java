@@ -86,10 +86,10 @@ public class WorkSessionsUnderReviewAdapter extends RecyclerView.Adapter<WorkSes
             endTime = "End: " + LocalDateTime.parse(workSessionDTO.getEndTime()).format(formatter).toString();
         }
 
+        holder.setWorkSessionState(workSessionDTO.getWorkSessionState());
         holder.setUnderReviewActivity(true);
         holder.setOnWorkSessionUpdateCallback(this);
         holder.setActivityAndSharedPreferences(activity);
-        holder.setUserRole(role);
         holder.setWorkSessionId(workSessionDTO.getId());
         holder.firstNameAndLastNameTv.setText(workSessionDTO.getEmployeeName());
         holder.startingDateTv.setText(startTime);
@@ -140,6 +140,22 @@ public class WorkSessionsUnderReviewAdapter extends RecyclerView.Adapter<WorkSes
         int positionToUpdate = workSessionDTOs.indexOf(workSessionToUpdate.get(0));
 
         workSessionToUpdate.get(0).setWorkSessionState(workSessionState);
+        activity.runOnUiThread(() -> notifyItemChanged(positionToUpdate));
+    }
+
+    @Override
+    public void updateNotesFromEmployee(int workSessionId, String notesFromEmployee)
+    {
+        List<WorkSessionDTO> workSessionToUpdate = workSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
+
+        if (workSessionToUpdate.size() == 0)
+        {
+            return;
+        }
+
+        int positionToUpdate = workSessionDTOs.indexOf(workSessionToUpdate.get(0));
+
+        workSessionToUpdate.get(0).setNotesFromEmployee(notesFromEmployee);
         activity.runOnUiThread(() -> notifyItemChanged(positionToUpdate));
     }
 }

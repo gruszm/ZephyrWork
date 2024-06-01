@@ -17,8 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -33,29 +31,26 @@ import pl.gruszm.zephyrwork.activities.LoginActivity;
 import pl.gruszm.zephyrwork.activities.WorkSessionRouteActivity;
 import pl.gruszm.zephyrwork.callbacks.OnWorkSessionUpdateCallback;
 import pl.gruszm.zephyrwork.config.AppConfig;
-import pl.gruszm.zephyrwork.enums.RoleType;
 import pl.gruszm.zephyrwork.enums.WorkSessionState;
 
 public class WorkSessionViewHolder extends RecyclerView.ViewHolder
 {
     private OkHttpClient okHttpClient;
-    private Gson gson;
     private SharedPreferences sharedPreferences;
     private Activity activity;
-    private RoleType userRole;
     private int workSessionId;
     public TextView firstNameAndLastNameTv, startingDateTv, endingDateTv, state;
     private Button detailsBtn;
     private OnWorkSessionUpdateCallback onWorkSessionUpdateCallback;
     private boolean isUnderReviewActivity = false;
     private String notesFromSupervisor, notesFromEmployee;
+    private WorkSessionState workSessionState;
 
     public WorkSessionViewHolder(@NonNull View itemView)
     {
         super(itemView);
 
         okHttpClient = new OkHttpClient();
-        gson = new Gson();
 
         firstNameAndLastNameTv = itemView.findViewById(R.id.first_name_and_last_name);
         startingDateTv = itemView.findViewById(R.id.starting_date);
@@ -119,13 +114,17 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
                 approveWorkSession(dialog);
             });
         }
-        else
+        else if (workSessionState.equals(WorkSessionState.RETURNED))
         {
             alertDialogBuilder.setPositiveButton("RE-SEND", (dialogInterface, i) ->
             {
                 dialogInterface.dismiss();
                 showResendDialog();
             });
+        }
+        else if (workSessionState.equals(WorkSessionState.IN_PROGRESS))
+        {
+
         }
 
         alertDialogBuilder.create().show();
@@ -194,8 +193,9 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
             {
                 if (response.isSuccessful())
                 {
-                    activity.runOnUiThread(() -> Toast.makeText(activity, "Work session re-sent.", Toast.LENGTH_SHORT).show());
+                    activity.runOnUiThread(() -> Toast.makeText(activity, "Work session re-sent for approval.", Toast.LENGTH_SHORT).show());
                     onWorkSessionUpdateCallback.updateWorkSessionState(workSessionId, WorkSessionState.UNDER_REVIEW);
+                    onWorkSessionUpdateCallback.updateNotesFromEmployee(workSessionId, answer);
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
@@ -383,11 +383,6 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
         });
     }
 
-    public void setUserRole(RoleType userRole)
-    {
-        this.userRole = userRole;
-    }
-
     public void setActivityAndSharedPreferences(Activity activity)
     {
         this.activity = activity;
@@ -428,5 +423,10 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
     public void setNotesFromEmployee(String notesFromEmployee)
     {
         this.notesFromEmployee = notesFromEmployee;
+    }
+
+    public void setWorkSessionState(WorkSessionState workSessionState)
+    {
+        this.workSessionState = workSessionState;
     }
 }

@@ -13,7 +13,7 @@
 
         <item
             android:id="@+id/employees_work_sessions"
-            android:title="Work Session Under Review"
+            android:title="Work Sessions Under Review"
             android:checked="true" />
 
     </group>
