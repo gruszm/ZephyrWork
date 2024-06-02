@@ -181,9 +181,12 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
                         onWorkSessionUpdateCallback.updateWorkSessionState(workSessionId, WorkSessionState.CANCELLED);
 
                         // Shut down the service
-                        Intent intent = new Intent(activity, LocationSenderService.class);
+                        if (workSessionState.equals(WorkSessionState.IN_PROGRESS))
+                        {
+                            Intent intent = new Intent(activity, LocationSenderService.class);
 
-                        activity.stopService(intent);
+                            activity.stopService(intent);
+                        }
                     }
                     else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                     {
