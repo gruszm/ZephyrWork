@@ -9,17 +9,12 @@ public class WorkSessionDTO
     private String endTime;
     private String employeeName;
     private WorkSessionState workSessionState;
+    private String notesFromSupervisor;
+    private String notesFromEmployee;
 
     public int getId()
     {
         return id;
-    }
-
-    public WorkSessionDTO setId(int id)
-    {
-        this.id = id;
-
-        return this;
     }
 
     public String getStartTime()
@@ -27,23 +22,9 @@ public class WorkSessionDTO
         return startTime;
     }
 
-    public WorkSessionDTO setStartTime(String startTime)
-    {
-        this.startTime = startTime;
-
-        return this;
-    }
-
     public String getEndTime()
     {
         return endTime;
-    }
-
-    public WorkSessionDTO setEndTime(String endTime)
-    {
-        this.endTime = endTime;
-
-        return this;
     }
 
     public String getEmployeeName()
@@ -51,22 +32,53 @@ public class WorkSessionDTO
         return employeeName;
     }
 
-    public WorkSessionDTO setEmployeeName(String employeeName)
-    {
-        this.employeeName = employeeName;
-
-        return this;
-    }
-
     public WorkSessionState getWorkSessionState()
     {
         return workSessionState;
     }
 
-    public WorkSessionDTO setWorkSessionState(WorkSessionState workSessionState)
+    public String getNotesFromSupervisor()
+    {
+        return notesFromSupervisor;
+    }
+
+    public String getNotesFromEmployee()
+    {
+        return notesFromEmployee;
+    }
+
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public void setStartTime(String startTime)
+    {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(String endTime)
+    {
+        this.endTime = endTime;
+    }
+
+    public void setEmployeeName(String employeeName)
+    {
+        this.employeeName = employeeName;
+    }
+
+    public void setWorkSessionState(WorkSessionState workSessionState)
     {
         this.workSessionState = workSessionState;
+    }
 
-        return this;
+    public void setNotesFromSupervisor(String notesFromSupervisor)
+    {
+        this.notesFromSupervisor = notesFromSupervisor;
+    }
+
+    public void setNotesFromEmployee(String notesFromEmployee)
+    {
+        this.notesFromEmployee = notesFromEmployee;
     }
 }

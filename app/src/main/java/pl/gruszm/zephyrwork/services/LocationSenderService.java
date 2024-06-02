@@ -114,7 +114,7 @@ public class LocationSenderService extends Service implements LocationListener
     private Notification getNotification()
     {
         Intent notificationIntent = new Intent(this, WorkSessionActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("ZephyrWork")
@@ -162,7 +162,7 @@ public class LocationSenderService extends Service implements LocationListener
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
-                    showToast("Authorization error. The location could be sent. Please log in to resume location sending.");
+                    showToast("Authorization error. The location could not be sent. Please log in to resume location sending.");
                 }
             }
         });
