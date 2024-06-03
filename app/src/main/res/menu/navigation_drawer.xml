@@ -4,18 +4,39 @@
       tools:showIn="navigation_view">
 
     <group
+        android:id="@+id/nav_drawer_group_1"
         android:checkableBehavior="single">
 
         <item
             android:id="@+id/my_work_sessions"
+            android:icon="@drawable/round_home_work_24"
             android:title="My Work Sessions"
             android:checked="true" />
 
-        <item
-            android:id="@+id/employees_work_sessions"
-            android:title="Work Sessions Under Review"
-            android:checked="true" />
-
     </group>
+
+    <item android:title="Only for supervisors">
+
+        <menu>
+
+            <group
+                android:id="@+id/nav_drawer_group_2"
+                android:checkableBehavior="none">
+
+                <item
+                    android:id="@+id/employees_work_sessions"
+                    android:icon="@drawable/baseline_reviews_24"
+                    android:title="Work Sessions Under Review" />
+
+                <item
+                    android:id="@+id/register_new_employee"
+                    android:icon="@drawable/round_assignment_ind_24"
+                    android:title="Register a new employee" />
+
+            </group>
+
+        </menu>
+
+    </item>
 
 </menu>

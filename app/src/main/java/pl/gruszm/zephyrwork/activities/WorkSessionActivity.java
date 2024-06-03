@@ -94,7 +94,6 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
         userProfileBtn = findViewById(R.id.user_profile_btn);
         logoutBtn = findViewById(R.id.logout_btn);
-        registerNewEmployeeBtn = findViewById(R.id.register_new_employee_btn);
 
         // OnClickListeners
         startWorkSessionBtn.setOnClickListener(this::startWorkSessionOnClickListener);
@@ -129,6 +128,10 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
             intent.putExtra("role", userRole);
 
             startActivity(intent);
+        }
+        else if (id == R.id.register_new_employee)
+        {
+
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
