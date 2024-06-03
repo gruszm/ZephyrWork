@@ -48,7 +48,7 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
     private boolean callLock;
 
     // Buttons
-    private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn, registerNewEmployeeBtn;
+    private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn;
 
     // Layout
     private DrawerLayout drawerLayout;
@@ -94,14 +94,12 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
         finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
         userProfileBtn = findViewById(R.id.user_profile_btn);
         logoutBtn = findViewById(R.id.logout_btn);
-        registerNewEmployeeBtn = findViewById(R.id.register_new_employee_btn);
 
         // OnClickListeners
         startWorkSessionBtn.setOnClickListener(this::startWorkSessionOnClickListener);
         finishWorkSessionBtn.setOnClickListener(this::finishWorkSessionOnClickListener);
         userProfileBtn.setOnClickListener(this::userProfileOnClickListener);
         logoutBtn.setOnClickListener(this::logoutOnClickListener);
-        registerNewEmployeeBtn.setOnClickListener(this::registerNewEmployeeListener);
 
         // Toolbar and navigation handling
         toolbar.setNavigationOnClickListener(this::navigationOnClickListener);
@@ -137,6 +135,24 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
             {
                 Intent intent = new Intent(this, WorkSessionsUnderReviewActivity.class);
                 intent.putExtra("role", userRole);
+
+                startActivity(intent);
+            }
+        }
+        else if (id == R.id.register_new_employee)
+        {
+            if (userRole.equals(RoleType.EMPLOYEE.name()))
+            {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                alertDialogBuilder.setTitle("ERROR");
+                alertDialogBuilder.setMessage("This action is not available for regular employees.");
+                alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
+                alertDialogBuilder.create().show();
+            }
+            else
+            {
+                Intent intent = new Intent(this, RegisterNewEmployeeActivity.class);
+                intent.putExtra("user_role", userRole);
 
                 startActivity(intent);
             }
@@ -206,12 +222,6 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
                 if (response.isSuccessful())
                 {
                     UserDTO userDTO = gson.fromJson(response.body().string(), UserDTO.class);
-
-                    // Regular employees cannot register new employees
-                    if (!userDTO.getRoleName().equals(RoleType.EMPLOYEE.name()))
-                    {
-                        runOnUiThread(() -> registerNewEmployeeBtn.setVisibility(View.VISIBLE));
-                    }
 
                     runOnUiThread(() ->
                     {
