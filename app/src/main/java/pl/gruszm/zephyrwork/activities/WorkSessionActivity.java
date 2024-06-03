@@ -125,10 +125,20 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
         }
         else if (id == R.id.employees_work_sessions)
         {
-            Intent intent = new Intent(this, WorkSessionsUnderReviewActivity.class);
-            intent.putExtra("role", userRole);
+            if (userRole.equals(RoleType.EMPLOYEE))
+            {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                alertDialogBuilder.setTitle("ERROR");
+                alertDialogBuilder.setMessage("This tab is not available for regular employees.");
+                alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
+            }
+            else
+            {
+                Intent intent = new Intent(this, WorkSessionsUnderReviewActivity.class);
+                intent.putExtra("role", userRole);
 
-            startActivity(intent);
+                startActivity(intent);
+            }
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
