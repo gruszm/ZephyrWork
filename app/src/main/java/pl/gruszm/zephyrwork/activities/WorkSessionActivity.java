@@ -129,7 +129,7 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
             {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                 alertDialogBuilder.setTitle("ERROR");
-                alertDialogBuilder.setMessage("This tab is not available for regular employees.");
+                alertDialogBuilder.setMessage("This action is not available for regular employees.");
                 alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
             }
             else
