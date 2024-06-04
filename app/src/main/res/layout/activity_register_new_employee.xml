@@ -12,15 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/logout_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:text="LOG OUT"
-            android:textSize="24sp" />
-
         <TextView
             android:id="@+id/registration_email_tv"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -154,18 +145,21 @@
             android:layout_marginRight="80dp"
             android:spinnerMode="dialog" />
 
-        <Button
-            android:id="@+id/registration_register_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Register"
-            android:textSize="28sp"
+        <ImageButton
+            android:id="@+id/registration_register_icon"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/registration_supervisor_spinner"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/round_person_add_alt_1_24"
+            android:background="@drawable/circle_background"
+            android:backgroundTint="#7CE47C"
+            android:padding="12dp"
+            android:scaleType="fitCenter" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
