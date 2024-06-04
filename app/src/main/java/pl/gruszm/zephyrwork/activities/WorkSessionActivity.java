@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +49,7 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
     private boolean callLock;
 
     // Buttons
-    private Button startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn;
+    private ImageButton startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn;
 
     // Layout
     private DrawerLayout drawerLayout;
@@ -90,10 +91,10 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
         email = navigationView.getHeaderView(0).findViewById(R.id.nav_header_email);
 
         // Buttons
-        startWorkSessionBtn = findViewById(R.id.start_work_session_btn);
-        finishWorkSessionBtn = findViewById(R.id.finish_work_session_btn);
-        userProfileBtn = findViewById(R.id.user_profile_btn);
-        logoutBtn = findViewById(R.id.logout_btn);
+        startWorkSessionBtn = findViewById(R.id.start_work_session_icon);
+        finishWorkSessionBtn = findViewById(R.id.finish_work_session_icon);
+        userProfileBtn = findViewById(R.id.user_profile_icon);
+        logoutBtn = findViewById(R.id.logout_icon);
 
         // OnClickListeners
         startWorkSessionBtn.setOnClickListener(this::startWorkSessionOnClickListener);
