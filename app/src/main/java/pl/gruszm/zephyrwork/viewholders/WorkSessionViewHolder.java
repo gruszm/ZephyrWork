@@ -8,8 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +41,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
     private Activity activity;
     private int workSessionId;
     public TextView firstNameAndLastNameTv, startingDateTv, endingDateTv, state;
-    private Button detailsBtn;
+    private ImageButton detailsBtn;
     private OnWorkSessionUpdateCallback onWorkSessionUpdateCallback;
     private boolean isUnderReviewActivity = false;
     private String notesFromSupervisor, notesFromEmployee;
@@ -56,7 +56,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
         firstNameAndLastNameTv = itemView.findViewById(R.id.first_name_and_last_name);
         startingDateTv = itemView.findViewById(R.id.starting_date);
         endingDateTv = itemView.findViewById(R.id.ending_date);
-        detailsBtn = itemView.findViewById(R.id.details);
+        detailsBtn = itemView.findViewById(R.id.details_icon);
         state = itemView.findViewById(R.id.state);
 
         detailsBtn.setOnClickListener(this::detailsOnClickListener);
