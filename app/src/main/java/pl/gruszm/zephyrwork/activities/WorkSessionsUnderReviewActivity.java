@@ -56,7 +56,7 @@ public class WorkSessionsUnderReviewActivity extends AppCompatActivity
         {
             Bundle extras = getIntent().getExtras();
 
-            role = RoleType.valueOf(extras.getString("role", EMPLOYEE.name()));
+            role = RoleType.valueOf(extras.getString("user_role", EMPLOYEE.name()));
         }
 
         recyclerView = findViewById(R.id.recycler_view);

@@ -42,7 +42,7 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
         if (id == R.id.my_work_sessions)
         {
             Intent intent = new Intent(activity, MyWorkSessionsActivity.class);
-            intent.putExtra("role", userRole);
+            intent.putExtra("user_role", userRole);
             intent.putExtra("nav_first_and_last_name", firstNameAndLastName);
             intent.putExtra("email", email);
 
@@ -61,7 +61,7 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
             else
             {
                 Intent intent = new Intent(activity, WorkSessionsUnderReviewActivity.class);
-                intent.putExtra("role", userRole);
+                intent.putExtra("user_role", userRole);
                 intent.putExtra("nav_first_and_last_name", firstNameAndLastName);
                 intent.putExtra("email", email);
 
