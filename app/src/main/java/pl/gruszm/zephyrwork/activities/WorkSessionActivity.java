@@ -38,9 +38,10 @@ import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.RoleType;
+import pl.gruszm.zephyrwork.navigation.MyOnNavigationItemSelectedListener;
 import pl.gruszm.zephyrwork.services.LocationSenderService;
 
-public class WorkSessionActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
+public class WorkSessionActivity extends AppCompatActivity
 {
     // Common
     private OkHttpClient okHttpClient;
@@ -102,66 +103,8 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
         userProfileBtn.setOnClickListener(this::userProfileOnClickListener);
         logoutBtn.setOnClickListener(this::logoutOnClickListener);
 
-        // Toolbar and navigation handling
-        toolbar.setNavigationOnClickListener(this::navigationOnClickListener);
-        navigationView.setNavigationItemSelectedListener(this);
-
         // Enable button for managers and the CEO, update data in the navigation header
         checkUserDataAndUpdateView();
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
-    {
-        int id = menuItem.getItemId();
-
-        if (id == R.id.my_work_sessions)
-        {
-            Intent intent = new Intent(this, MyWorkSessionsActivity.class);
-            intent.putExtra("role", userRole);
-
-            startActivity(intent);
-        }
-        else if (id == R.id.employees_work_sessions)
-        {
-            if (userRole.equals(RoleType.EMPLOYEE.name()))
-            {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                alertDialogBuilder.setTitle("ERROR");
-                alertDialogBuilder.setMessage("This action is not available for regular employees.");
-                alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
-                alertDialogBuilder.create().show();
-            }
-            else
-            {
-                Intent intent = new Intent(this, WorkSessionsUnderReviewActivity.class);
-                intent.putExtra("role", userRole);
-
-                startActivity(intent);
-            }
-        }
-        else if (id == R.id.register_new_employee)
-        {
-            if (userRole.equals(RoleType.EMPLOYEE.name()))
-            {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                alertDialogBuilder.setTitle("ERROR");
-                alertDialogBuilder.setMessage("This action is not available for regular employees.");
-                alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
-                alertDialogBuilder.create().show();
-            }
-            else
-            {
-                Intent intent = new Intent(this, RegisterNewEmployeeActivity.class);
-                intent.putExtra("user_role", userRole);
-
-                startActivity(intent);
-            }
-        }
-
-        drawerLayout.closeDrawer(GravityCompat.START);
-
-        return true;
     }
 
     @Override
@@ -187,14 +130,6 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
         {
             drawerLayout.openDrawer(GravityCompat.START);
         }
-    }
-
-    private void registerNewEmployeeListener(View view)
-    {
-        Intent intent = new Intent(this, RegisterNewEmployeeActivity.class);
-        intent.putExtra("user_role", userRole);
-
-        startActivity(intent);
     }
 
     private void checkUserDataAndUpdateView()
@@ -234,6 +169,11 @@ public class WorkSessionActivity extends AppCompatActivity implements Navigation
                     });
 
                     userRole = userDTO.getRoleName();
+
+                    // Toolbar and navigation handling
+                    MyOnNavigationItemSelectedListener itemSelectedListener = new MyOnNavigationItemSelectedListener(WorkSessionActivity.this, userRole, drawerLayout);
+                    toolbar.setNavigationOnClickListener(WorkSessionActivity.this::navigationOnClickListener);
+                    navigationView.setNavigationItemSelectedListener(itemSelectedListener);
 
                     response.close();
                 }
