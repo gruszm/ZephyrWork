@@ -26,6 +26,6 @@
     <style name="RegistrationStyleSecondary">
         <item name="android:textStyle">bold</item>
         <item name="layout_constraintRight_toRightOf">parent</item>
-        <item name="android:layout_marginRight">80dp</item>
+        <item name="android:layout_marginRight">40dp</item>
     </style>
 </resources>
