@@ -7,8 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -46,7 +46,7 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
     private Gson gson;
     private EditText email, repeatEmail, firstName, lastName, password, repeatPassword;
     private Spinner roleSpinner, supervisorSpinner;
-    private Button registerBtn, logoutBtn;
+    private ImageButton registerBtn;
     private String userRole;
     private RoleType[] rolesChoice;
 
@@ -90,27 +90,13 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
         supervisorSpinner = findViewById(R.id.registration_supervisor_spinner);
 
         // Buttons
-        registerBtn = findViewById(R.id.registration_register_btn);
-        logoutBtn = findViewById(R.id.logout_btn);
+        registerBtn = findViewById(R.id.registration_register_icon);
 
         // OnClickListeners
         registerBtn.setOnClickListener(this::registerOnClickListener);
-        logoutBtn.setOnClickListener(this::logoutOnClickListener);
 
         // Populate the spinners with roles and supervisors
         populateSpinners();
-    }
-
-    private void logoutOnClickListener(View view)
-    {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Intent intent = new Intent(this, LoginActivity.class);
-
-        editor.remove("Auth");
-        editor.apply();
-
-        finish();
-        startActivity(intent);
     }
 
     private void registerOnClickListener(View view)

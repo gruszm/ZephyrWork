@@ -31,7 +31,6 @@ public class UserProfileActivity extends AppCompatActivity
     private OkHttpClient okHttpClient;
     private Gson gson;
     private SharedPreferences sharedPreferences;
-    private Button logoutBtn;
     private TextView firstName, lastName, email, role, supervisorFirstName, supervisorLastName, supervisorEmail;
 
     @Override
@@ -44,8 +43,6 @@ public class UserProfileActivity extends AppCompatActivity
         gson = new Gson();
         sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 
-        logoutBtn = findViewById(R.id.logout_btn);
-
         firstName = findViewById(R.id.user_profile_first_name_edit);
         lastName = findViewById(R.id.user_profile_last_name_edit);
         email = findViewById(R.id.user_profile_email_edit);
@@ -53,8 +50,6 @@ public class UserProfileActivity extends AppCompatActivity
         supervisorFirstName = findViewById(R.id.user_profile_supervisor_first_name_edit);
         supervisorLastName = findViewById(R.id.user_profile_supervisor_last_name_edit);
         supervisorEmail = findViewById(R.id.user_profile_supervisor_email_edit);
-
-        logoutBtn.setOnClickListener(this::logoutOnClickListener);
 
         retrieveUserData();
     }
