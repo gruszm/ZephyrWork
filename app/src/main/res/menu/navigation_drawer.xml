@@ -8,10 +8,15 @@
         android:checkableBehavior="single">
 
         <item
+            android:id="@+id/home"
+            android:icon="@drawable/round_home_24"
+            android:title="Home"
+            android:checked="true" />
+
+        <item
             android:id="@+id/my_work_sessions"
             android:icon="@drawable/round_home_work_24"
-            android:title="My Work Sessions"
-            android:checked="true" />
+            android:title="My Work Sessions" />
 
     </group>
 
@@ -21,7 +26,7 @@
 
             <group
                 android:id="@+id/nav_drawer_group_2"
-                android:checkableBehavior="none">
+                android:checkableBehavior="single">
 
                 <item
                     android:id="@+id/employees_work_sessions"

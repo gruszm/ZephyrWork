@@ -14,6 +14,7 @@ import com.google.android.material.navigation.NavigationView;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.activities.MyWorkSessionsActivity;
 import pl.gruszm.zephyrwork.activities.RegisterNewEmployeeActivity;
+import pl.gruszm.zephyrwork.activities.WorkSessionActivity;
 import pl.gruszm.zephyrwork.activities.WorkSessionsUnderReviewActivity;
 import pl.gruszm.zephyrwork.enums.RoleType;
 
@@ -87,6 +88,14 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
 
                 activity.startActivity(intent);
             }
+        }
+        else if (id == R.id.home)
+        {
+            Intent intent = new Intent(activity, WorkSessionActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            activity.finish();
+            activity.startActivity(intent);
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

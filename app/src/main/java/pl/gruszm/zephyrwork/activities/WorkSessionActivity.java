@@ -163,20 +163,20 @@ public class WorkSessionActivity extends AppCompatActivity
                                 .concat(userDTO.getLastName()));
 
                         navEmail.setText(userDTO.getEmail());
+
+                        userRole = userDTO.getRoleName();
+
+                        // Toolbar and navigation handling
+                        MyOnNavigationItemSelectedListener itemSelectedListener = new MyOnNavigationItemSelectedListener(
+                                WorkSessionActivity.this,
+                                userRole,
+                                navFirstNameAndLastName.getText().toString(),
+                                navEmail.getText().toString(),
+                                drawerLayout
+                        );
+                        toolbar.setNavigationOnClickListener(WorkSessionActivity.this::navigationOnClickListener);
+                        navigationView.setNavigationItemSelectedListener(itemSelectedListener);
                     });
-
-                    userRole = userDTO.getRoleName();
-
-                    // Toolbar and navigation handling
-                    MyOnNavigationItemSelectedListener itemSelectedListener = new MyOnNavigationItemSelectedListener(
-                            WorkSessionActivity.this,
-                            userRole,
-                            navFirstNameAndLastName.getText().toString(),
-                            navEmail.getText().toString(),
-                            drawerLayout
-                    );
-                    toolbar.setNavigationOnClickListener(WorkSessionActivity.this::navigationOnClickListener);
-                    navigationView.setNavigationItemSelectedListener(itemSelectedListener);
 
                     response.close();
                 }
