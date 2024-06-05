@@ -73,22 +73,6 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_new_employee);
 
-        if (savedInstanceState == null)
-        {
-            Bundle extras = getIntent().getExtras();
-            userRole = extras.getString("user_role");
-
-            // Set the choice of roles to those lower than user's role
-            if (userRole.equals(RoleType.CEO.name()))
-            {
-                rolesChoice = new RoleType[]{RoleType.EMPLOYEE, RoleType.MANAGER};
-            }
-            else
-            {
-                rolesChoice = new RoleType[]{RoleType.EMPLOYEE};
-            }
-        }
-
         // Common
         sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         okHttpClient = new OkHttpClient();
@@ -128,7 +112,31 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
         registerBtn.setOnClickListener(this::registerOnClickListener);
 
         // Toolbar and navigation handling
-        MyOnNavigationItemSelectedListener itemSelectedListener = new MyOnNavigationItemSelectedListener(this, userRole, drawerLayout);
+        if (savedInstanceState == null)
+        {
+            Bundle extras = getIntent().getExtras();
+            userRole = extras.getString("user_role");
+            navFirstNameAndLastName.setText(extras.getString("nav_first_and_last_name", ""));
+            navEmail.setText(extras.getString("email", ""));
+
+            // Set the choice of roles to those lower than user's role
+            if (userRole.equals(RoleType.CEO.name()))
+            {
+                rolesChoice = new RoleType[]{RoleType.EMPLOYEE, RoleType.MANAGER};
+            }
+            else
+            {
+                rolesChoice = new RoleType[]{RoleType.EMPLOYEE};
+            }
+        }
+
+        MyOnNavigationItemSelectedListener itemSelectedListener = new MyOnNavigationItemSelectedListener(
+                this,
+                userRole,
+                navFirstNameAndLastName.getText().toString(),
+                navEmail.getText().toString(),
+                drawerLayout
+        );
         toolbar.setNavigationOnClickListener(this::navigationOnClickListener);
         navigationView.setNavigationItemSelectedListener(itemSelectedListener);
 

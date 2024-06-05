@@ -11,8 +11,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -25,6 +30,8 @@ import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
+import pl.gruszm.zephyrwork.enums.RoleType;
+import pl.gruszm.zephyrwork.navigation.MyOnNavigationItemSelectedListener;
 
 public class UserProfileActivity extends AppCompatActivity
 {
@@ -32,6 +39,16 @@ public class UserProfileActivity extends AppCompatActivity
     private Gson gson;
     private SharedPreferences sharedPreferences;
     private TextView firstName, lastName, email, role, supervisorFirstName, supervisorLastName, supervisorEmail;
+
+    // Layout
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle toggle;
+    private Toolbar toolbar;
+    private NavigationView navigationView;
+
+    // Navigation Header Views
+    private TextView navFirstNameAndLastName, navEmail;
+    private String userRole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,20 +68,41 @@ public class UserProfileActivity extends AppCompatActivity
         supervisorLastName = findViewById(R.id.user_profile_supervisor_last_name_edit);
         supervisorEmail = findViewById(R.id.user_profile_supervisor_email_edit);
 
+        // Layout
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        toolbar = findViewById(R.id.toolbar);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
+        // Configure navigation
+        setSupportActionBar(toolbar);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // Navigation Header Views
+        navFirstNameAndLastName = navigationView.getHeaderView(0).findViewById(R.id.nav_header_name);
+        navEmail = navigationView.getHeaderView(0).findViewById(R.id.nav_header_email);
+
+        // Toolbar and navigation handling
+        if (savedInstanceState == null)
+        {
+            Bundle extras = getIntent().getExtras();
+            userRole = extras.getString("user_role");
+            navFirstNameAndLastName.setText(extras.getString("nav_first_and_last_name", ""));
+            navEmail.setText(extras.getString("email", ""));
+        }
+
+        MyOnNavigationItemSelectedListener itemSelectedListener = new MyOnNavigationItemSelectedListener(
+                this,
+                userRole,
+                navFirstNameAndLastName.getText().toString(),
+                navEmail.getText().toString(),
+                drawerLayout
+        );
+        toolbar.setNavigationOnClickListener(this::navigationOnClickListener);
+        navigationView.setNavigationItemSelectedListener(itemSelectedListener);
+
         retrieveUserData();
-    }
-
-    private void logoutOnClickListener(View view)
-    {
-        SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Intent intent = new Intent(this, LoginActivity.class);
-
-        editor.remove("Auth");
-        editor.apply();
-
-        finish();
-        startActivity(intent);
     }
 
     private void retrieveUserData()
@@ -102,6 +140,8 @@ public class UserProfileActivity extends AppCompatActivity
                         lastName.setText(userDTO.getLastName());
                         email.setText(userDTO.getEmail());
                         role.setText(userDTO.getRoleName());
+                        navFirstNameAndLastName.setText(userDTO.getFirstName().concat(" ").concat(userDTO.getLastName()));
+                        navEmail.setText(userDTO.getEmail());
                     });
 
                     retrieveSupervisorData();
@@ -122,6 +162,18 @@ public class UserProfileActivity extends AppCompatActivity
                 }
             }
         });
+    }
+
+    private void navigationOnClickListener(View view)
+    {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START))
+        {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
+        else
+        {
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
     }
 
     private void retrieveSupervisorData()

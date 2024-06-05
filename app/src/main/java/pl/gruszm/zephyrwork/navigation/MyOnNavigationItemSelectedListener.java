@@ -21,12 +21,16 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
 {
     private Activity activity;
     private String userRole;
+    private String firstNameAndLastName;
+    private String email;
     private DrawerLayout drawerLayout;
 
-    public MyOnNavigationItemSelectedListener(Activity activity, String userRole, DrawerLayout drawerLayout)
+    public MyOnNavigationItemSelectedListener(Activity activity, String userRole, String firstNameAndLastName, String email, DrawerLayout drawerLayout)
     {
         this.activity = activity;
         this.userRole = userRole;
+        this.firstNameAndLastName = firstNameAndLastName;
+        this.email = email;
         this.drawerLayout = drawerLayout;
     }
 
@@ -39,6 +43,8 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
         {
             Intent intent = new Intent(activity, MyWorkSessionsActivity.class);
             intent.putExtra("role", userRole);
+            intent.putExtra("nav_first_and_last_name", firstNameAndLastName);
+            intent.putExtra("email", email);
 
             activity.startActivity(intent);
         }
@@ -56,6 +62,8 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
             {
                 Intent intent = new Intent(activity, WorkSessionsUnderReviewActivity.class);
                 intent.putExtra("role", userRole);
+                intent.putExtra("nav_first_and_last_name", firstNameAndLastName);
+                intent.putExtra("email", email);
 
                 activity.startActivity(intent);
             }
@@ -74,6 +82,8 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
             {
                 Intent intent = new Intent(activity, RegisterNewEmployeeActivity.class);
                 intent.putExtra("user_role", userRole);
+                intent.putExtra("nav_first_and_last_name", firstNameAndLastName);
+                intent.putExtra("email", email);
 
                 activity.startActivity(intent);
             }
