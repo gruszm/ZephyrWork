@@ -5,17 +5,24 @@ import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MS
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -36,6 +43,7 @@ import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.RoleType;
+import pl.gruszm.zephyrwork.navigation.MyOnNavigationItemSelectedListener;
 
 public class RegisterNewEmployeeActivity extends AppCompatActivity
 {
@@ -50,32 +58,40 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
     private String userRole;
     private RoleType[] rolesChoice;
 
+    // Layout
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle toggle;
+    private Toolbar toolbar;
+    private NavigationView navigationView;
+
+    // Navigation Header Views
+    private TextView navFirstNameAndLastName, navEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_new_employee);
 
-        if (savedInstanceState == null)
-        {
-            Bundle extras = getIntent().getExtras();
-            userRole = extras.getString("user_role");
-
-            // Set the choice of roles to those lower than user's role
-            if (userRole.equals(RoleType.CEO.name()))
-            {
-                rolesChoice = new RoleType[]{RoleType.EMPLOYEE, RoleType.MANAGER};
-            }
-            else
-            {
-                rolesChoice = new RoleType[]{RoleType.EMPLOYEE};
-            }
-        }
-
         // Common
         sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         okHttpClient = new OkHttpClient();
         gson = new Gson();
+
+        // Layout
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        toolbar = findViewById(R.id.toolbar);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
+        // Configure navigation
+        setSupportActionBar(toolbar);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // Navigation Header Views
+        navFirstNameAndLastName = navigationView.getHeaderView(0).findViewById(R.id.nav_header_name);
+        navEmail = navigationView.getHeaderView(0).findViewById(R.id.nav_header_email);
 
         // Edit Texts
         email = findViewById(R.id.registration_email_et);
@@ -95,8 +111,49 @@ public class RegisterNewEmployeeActivity extends AppCompatActivity
         // OnClickListeners
         registerBtn.setOnClickListener(this::registerOnClickListener);
 
+        // Toolbar and navigation handling
+        if (savedInstanceState == null)
+        {
+            Bundle extras = getIntent().getExtras();
+            userRole = extras.getString("user_role");
+            navFirstNameAndLastName.setText(extras.getString("nav_first_and_last_name", ""));
+            navEmail.setText(extras.getString("email", ""));
+
+            // Set the choice of roles to those lower than user's role
+            if (userRole.equals(RoleType.CEO.name()))
+            {
+                rolesChoice = new RoleType[]{RoleType.EMPLOYEE, RoleType.MANAGER};
+            }
+            else
+            {
+                rolesChoice = new RoleType[]{RoleType.EMPLOYEE};
+            }
+        }
+
+        MyOnNavigationItemSelectedListener itemSelectedListener = new MyOnNavigationItemSelectedListener(
+                this,
+                userRole,
+                navFirstNameAndLastName.getText().toString(),
+                navEmail.getText().toString(),
+                drawerLayout
+        );
+        toolbar.setNavigationOnClickListener(this::navigationOnClickListener);
+        navigationView.setNavigationItemSelectedListener(itemSelectedListener);
+
         // Populate the spinners with roles and supervisors
         populateSpinners();
+    }
+
+    private void navigationOnClickListener(View view)
+    {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START))
+        {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
+        else
+        {
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
     }
 
     private void registerOnClickListener(View view)
