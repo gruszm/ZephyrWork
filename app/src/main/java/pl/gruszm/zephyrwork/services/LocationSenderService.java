@@ -43,7 +43,7 @@ import pl.gruszm.zephyrwork.config.AppConfig;
 
 public class LocationSenderService extends Service implements LocationListener
 {
-    private static final int LOCATION_TRACKING_DELAY_MS = 5000;
+    private static final int LOCATION_TRACKING_DELAY_MS = 30000;
     private static final String CHANNEL_ID = "ZephyrWorkLocationServiceChannel";
     private OkHttpClient okHttpClient;
     private Gson gson;
@@ -94,20 +94,17 @@ public class LocationSenderService extends Service implements LocationListener
 
     private void createNotificationChannel()
     {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        NotificationChannel serviceChannel = new NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_ID,
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+
+        NotificationManager manager = getSystemService(NotificationManager.class);
+
+        if (manager != null)
         {
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    CHANNEL_ID,
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-
-            NotificationManager manager = getSystemService(NotificationManager.class);
-
-            if (manager != null)
-            {
-                manager.createNotificationChannel(serviceChannel);
-            }
+            manager.createNotificationChannel(serviceChannel);
         }
     }
 

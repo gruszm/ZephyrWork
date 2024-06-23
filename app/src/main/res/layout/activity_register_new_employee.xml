@@ -190,6 +190,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="20dp"
                     android:src="@drawable/round_person_add_alt_1_24"
+                    android:foreground="?attr/actionBarItemBackground"
                     android:background="@drawable/circle_background"
                     android:backgroundTint="#7CE47C"
                     android:padding="12dp"
