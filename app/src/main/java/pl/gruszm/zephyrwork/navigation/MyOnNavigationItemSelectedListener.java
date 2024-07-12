@@ -14,6 +14,7 @@ import com.google.android.material.navigation.NavigationView;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.activities.MyWorkSessionsActivity;
 import pl.gruszm.zephyrwork.activities.RegisterNewEmployeeActivity;
+import pl.gruszm.zephyrwork.activities.SubordinatesListActivity;
 import pl.gruszm.zephyrwork.activities.WorkSessionActivity;
 import pl.gruszm.zephyrwork.activities.WorkSessionsUnderReviewActivity;
 import pl.gruszm.zephyrwork.enums.RoleType;
@@ -88,6 +89,12 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
 
                 activity.startActivity(intent);
             }
+        }
+        else if (id == R.id.my_subordinates)
+        {
+            Intent intent = new Intent(activity, SubordinatesListActivity.class);
+
+            activity.startActivity(intent);
         }
         else if (id == R.id.home)
         {
