@@ -38,8 +38,6 @@ public class SubordinateViewHolder extends RecyclerView.ViewHolder
     {
         Gson gson = new Gson();
         Intent intent = new Intent(activity, EmployeeDetailsActivity.class);
-//        intent.putExtra("id", this.id);
-//        intent.putExtra("interval", this.interval);
         intent.putExtra("UserDTO", gson.toJson(userDTO));
 
         activity.startActivity(intent);

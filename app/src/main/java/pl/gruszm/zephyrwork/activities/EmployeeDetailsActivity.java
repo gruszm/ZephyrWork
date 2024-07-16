@@ -15,7 +15,6 @@ import pl.gruszm.zephyrwork.R;
 public class EmployeeDetailsActivity extends AppCompatActivity
 {
     private UserDTO userDTO;
-    //    private int employeeId, interval;
     private TextView employeeIdTv, email, firstName, lastName, role;
     private EditText intervalEt;
     private Button saveIntervalBtn;
@@ -47,50 +46,5 @@ public class EmployeeDetailsActivity extends AppCompatActivity
             role.setText(userDTO.getRoleName());
             intervalEt.setText(String.valueOf(userDTO.getLocationRegistrationInterval()));
         }
-
-//        retrieveEmployeeData();
     }
-
-//    private void retrieveEmployeeData()
-//    {
-//        OkHttpClient okHttpClient = new OkHttpClient();
-//        Gson gson = new Gson();
-//        SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
-//        Request request = new Request.Builder()
-//                .get()
-//                .url(AppConfig.BACKEND_BASE.concat("/api/users/id/").concat(String.valueOf(employeeId)))
-//                .header("Auth", sharedPreferences.getString("Auth", ""))
-//                .build();
-//        Call call = okHttpClient.newCall(request);
-//
-//        call.enqueue(new Callback()
-//        {
-//            @Override
-//            public void onFailure(@NonNull Call call, @NonNull IOException e)
-//            {
-//
-//            }
-//
-//            @Override
-//            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
-//            {
-//                if (response.isSuccessful())
-//                {
-//                    UserDTO userDTO = gson.fromJson(response.body().string(), UserDTO.class);
-//
-//                    runOnUiThread(() ->
-//                    {
-//                        employeeIdTv.setText(String.valueOf(userDTO.getId()));
-//                        email.setText(userDTO.getEmail());
-//                        firstName.setText(userDTO.getFirstName());
-//                        lastName.setText(userDTO.getLastName());
-//                        role.setText(userDTO.getRoleName());
-//                        intervalEt.setText(String.valueOf(userDTO.getLocationRegistrationInterval()));
-//                    });
-//
-//                    response.close();
-//                }
-//            }
-//        });
-//    }
 }
