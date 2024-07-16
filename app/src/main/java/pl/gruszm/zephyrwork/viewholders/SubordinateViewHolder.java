@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.activities.EmployeeDetailsActivity;
+import pl.gruszm.zephyrwork.callbacks.OnSubordinateDetailsClickCallback;
 
 public class SubordinateViewHolder extends RecyclerView.ViewHolder
 {
@@ -21,6 +22,7 @@ public class SubordinateViewHolder extends RecyclerView.ViewHolder
     private Activity activity;
     private TextView firstName, lastName, email;
     private ImageButton details;
+    private OnSubordinateDetailsClickCallback onSubordinateDetailsClickCallback;
 
     public SubordinateViewHolder(@NonNull View itemView)
     {
@@ -40,6 +42,7 @@ public class SubordinateViewHolder extends RecyclerView.ViewHolder
         Intent intent = new Intent(activity, EmployeeDetailsActivity.class);
         intent.putExtra("UserDTO", gson.toJson(userDTO));
 
+        onSubordinateDetailsClickCallback.vanishSubordinatesList();
         activity.startActivity(intent);
     }
 
@@ -55,5 +58,10 @@ public class SubordinateViewHolder extends RecyclerView.ViewHolder
         firstName.setText(userDTO.getFirstName());
         lastName.setText(userDTO.getLastName());
         email.setText(userDTO.getEmail());
+    }
+
+    public void setOnSubordinateDetailsClickCallback(OnSubordinateDetailsClickCallback onSubordinateDetailsClickCallback)
+    {
+        this.onSubordinateDetailsClickCallback = onSubordinateDetailsClickCallback;
     }
 }

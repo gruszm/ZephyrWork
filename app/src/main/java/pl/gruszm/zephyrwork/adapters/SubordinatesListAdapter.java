@@ -12,17 +12,20 @@ import java.util.List;
 
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
+import pl.gruszm.zephyrwork.callbacks.OnSubordinateDetailsClickCallback;
 import pl.gruszm.zephyrwork.viewholders.SubordinateViewHolder;
 
 public class SubordinatesListAdapter extends RecyclerView.Adapter<SubordinateViewHolder>
 {
     private Activity activity;
     private List<UserDTO> userDTOs;
+    private OnSubordinateDetailsClickCallback onSubordinateDetailsClickCallback;
 
-    public SubordinatesListAdapter(Activity activity, List<UserDTO> userDTOs)
+    public SubordinatesListAdapter(Activity activity, List<UserDTO> userDTOs, OnSubordinateDetailsClickCallback onSubordinateDetailsClickCallback)
     {
         this.activity = activity;
         this.userDTOs = userDTOs;
+        this.onSubordinateDetailsClickCallback = onSubordinateDetailsClickCallback;
     }
 
     @NonNull
@@ -40,6 +43,7 @@ public class SubordinatesListAdapter extends RecyclerView.Adapter<SubordinateVie
     {
         holder.setDataUsingUserDTO(userDTOs.get(position));
         holder.setActivity(this.activity);
+        holder.setOnSubordinateDetailsClickCallback(onSubordinateDetailsClickCallback);
     }
 
     @Override

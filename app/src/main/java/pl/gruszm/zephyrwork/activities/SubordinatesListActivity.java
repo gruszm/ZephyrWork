@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -24,10 +26,12 @@ import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.adapters.SubordinatesListAdapter;
+import pl.gruszm.zephyrwork.callbacks.OnSubordinateDetailsClickCallback;
 import pl.gruszm.zephyrwork.config.AppConfig;
 
-public class SubordinatesListActivity extends AppCompatActivity
+public class SubordinatesListActivity extends AppCompatActivity implements OnSubordinateDetailsClickCallback
 {
+    private ProgressBar progressBar;
     private RecyclerView recyclerView;
 
     @Override
@@ -36,8 +40,17 @@ public class SubordinatesListActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subordinates_list);
 
+        progressBar = findViewById(R.id.progress_bar);
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        retrieveSubordinates();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
 
         retrieveSubordinates();
     }
@@ -71,9 +84,22 @@ public class SubordinatesListActivity extends AppCompatActivity
                     {
                     }.getType();
                     List<UserDTO> userDTOs = gson.fromJson(response.body().string(), userDTOListType);
-                    runOnUiThread(() -> recyclerView.setAdapter(new SubordinatesListAdapter(SubordinatesListActivity.this, userDTOs)));
+                    SubordinatesListAdapter subordinatesListAdapter = new SubordinatesListAdapter(SubordinatesListActivity.this, userDTOs, SubordinatesListActivity.this);
+                    runOnUiThread(() ->
+                    {
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setAdapter(subordinatesListAdapter);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    });
                 }
             }
         });
+    }
+
+    @Override
+    public void vanishSubordinatesList()
+    {
+        recyclerView.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
     }
 }
