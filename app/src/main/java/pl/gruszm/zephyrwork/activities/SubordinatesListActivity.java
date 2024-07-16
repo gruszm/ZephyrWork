@@ -71,7 +71,7 @@ public class SubordinatesListActivity extends AppCompatActivity
                     {
                     }.getType();
                     List<UserDTO> userDTOs = gson.fromJson(response.body().string(), userDTOListType);
-                    runOnUiThread(() -> recyclerView.setAdapter(new SubordinatesListAdapter(userDTOs)));
+                    runOnUiThread(() -> recyclerView.setAdapter(new SubordinatesListAdapter(SubordinatesListActivity.this, userDTOs)));
                 }
             }
         });
