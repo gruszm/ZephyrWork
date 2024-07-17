@@ -19,6 +19,14 @@
         android:theme="@style/Theme.ZephyrWork"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".activities.EmployeeDetailsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.SubordinatesListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -61,6 +69,7 @@
 
         <service
             android:name=".services.LocationSenderService"
+            android:exported="false"
             android:foregroundServiceType="location" />
     </application>
 

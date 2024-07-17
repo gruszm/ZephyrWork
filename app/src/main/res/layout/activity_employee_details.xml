@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.EmployeeDetailsActivity">
+
+    <TextView
+        android:id="@+id/employee_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="TEST" />
+
+    <TextView
+        android:id="@+id/employee_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/employee_id"
+        app:layout_constraintTop_toBottomOf="@id/employee_id"
+        android:text="TEST" />
+
+    <TextView
+        android:id="@+id/employee_first_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/employee_email"
+        app:layout_constraintTop_toBottomOf="@id/employee_email"
+        android:text="TEST" />
+
+    <TextView
+        android:id="@+id/employee_last_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/employee_first_name"
+        app:layout_constraintTop_toBottomOf="@id/employee_first_name"
+        android:text="TEST" />
+
+    <TextView
+        android:id="@+id/employee_role"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/employee_last_name"
+        app:layout_constraintTop_toBottomOf="@id/employee_last_name"
+        android:text="TEST" />
+
+    <EditText
+        android:id="@+id/employee_location_registration_interval"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/employee_role"
+        app:layout_constraintTop_toBottomOf="@id/employee_role"
+        android:inputType="number"
+        android:textSize="14sp"
+        android:text="TEST" />
+
+    <ImageButton
+        android:id="@+id/save_interval_button"
+        android:layout_width="84dp"
+        android:layout_height="84dp"
+        app:layout_constraintLeft_toRightOf="@id/employee_location_registration_interval"
+        app:layout_constraintTop_toTopOf="@id/employee_location_registration_interval"
+        app:layout_constraintBottom_toBottomOf="@id/employee_location_registration_interval"
+        android:src="@drawable/outline_save_24"
+        android:background="@drawable/circle_background"
+        android:backgroundTint="#0099FF"
+        android:foreground="?actionBarItemBackground"
+        android:scaleType="fitCenter"
+        android:padding="4dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

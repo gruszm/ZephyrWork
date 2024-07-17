@@ -8,6 +8,7 @@ public class UserDTO
     private String lastName;
     private Integer supervisorId;
     private String roleName;
+    private int locationRegistrationInterval;
 
     public int getId()
     {
@@ -95,5 +96,17 @@ public class UserDTO
                 .append(getEmail());
 
         return sb.toString();
+    }
+
+    public int getLocationRegistrationInterval()
+    {
+        return locationRegistrationInterval;
+    }
+
+    public UserDTO setLocationRegistrationInterval(int locationRegistrationInterval)
+    {
+        this.locationRegistrationInterval = locationRegistrationInterval;
+
+        return this;
     }
 }

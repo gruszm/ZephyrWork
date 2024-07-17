@@ -241,6 +241,7 @@ public class WorkSessionActivity extends AppCompatActivity
                 {
                     // Start the location tracking
                     Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
+                    locationSenderService.putExtra("interval", Integer.parseInt(response.body().string()));
 
                     startService(locationSenderService);
 

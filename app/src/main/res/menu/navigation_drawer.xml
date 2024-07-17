@@ -38,6 +38,10 @@
                     android:icon="@drawable/round_assignment_ind_24"
                     android:title="Register a new employee" />
 
+                <item
+                    android:id="@+id/my_subordinates"
+                    android:title="My subordinates" />
+
             </group>
 
         </menu>

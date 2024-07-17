@@ -8,8 +8,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ServiceInfo;
 import android.location.Location;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -43,7 +43,7 @@ import pl.gruszm.zephyrwork.config.AppConfig;
 
 public class LocationSenderService extends Service implements LocationListener
 {
-    private static final int LOCATION_TRACKING_DELAY_MS = 30000;
+    private static final int DEFAULT_INTERVAL = 30;
     private static final String CHANNEL_ID = "ZephyrWorkLocationServiceChannel";
     private OkHttpClient okHttpClient;
     private Gson gson;
@@ -61,7 +61,7 @@ public class LocationSenderService extends Service implements LocationListener
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         createNotificationChannel();
-        startForeground(1, getNotification());
+        startForeground(1, getNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
     }
 
     // Suppressed, because permission is checked in the method, which starts the service
@@ -70,7 +70,7 @@ public class LocationSenderService extends Service implements LocationListener
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         fusedLocationProviderClient.requestLocationUpdates(
-                new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_TRACKING_DELAY_MS).build(),
+                new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, intent.getIntExtra("interval", DEFAULT_INTERVAL) * 1000).build(),
                 this,
                 Looper.getMainLooper()
         );
