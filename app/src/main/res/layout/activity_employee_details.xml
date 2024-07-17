@@ -57,14 +57,18 @@
         android:textSize="14sp"
         android:text="TEST" />
 
-    <Button
+    <ImageButton
         android:id="@+id/save_interval_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="84dp"
+        android:layout_height="84dp"
         app:layout_constraintLeft_toRightOf="@id/employee_location_registration_interval"
         app:layout_constraintTop_toTopOf="@id/employee_location_registration_interval"
         app:layout_constraintBottom_toBottomOf="@id/employee_location_registration_interval"
-        android:padding="0dp"
-        android:text="SAVE" />
+        android:src="@drawable/outline_save_24"
+        android:background="@drawable/circle_background"
+        android:backgroundTint="#0099FF"
+        android:foreground="?actionBarItemBackground"
+        android:scaleType="fitCenter"
+        android:padding="4dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
