@@ -2,15 +2,19 @@ package pl.gruszm.zephyrwork.activities;
 
 import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
@@ -48,7 +52,52 @@ public class LoginActivity extends AppCompatActivity
 
         submitButton.setOnClickListener(this::submitOnClickListener);
 
-        validateTokenAndSwitchActivity();
+        // When application is launched, check if GPS is active only once
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        {
+            validateTokenAndSwitchActivity();
+        }
+        else
+        {
+            ensureGpsIsActive();
+        }
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        ensureGpsIsActive();
+    }
+
+    private void ensureGpsIsActive()
+    {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("GPS provider is disabled")
+                    .setMessage("This application requires an active GPS provider. Please enable GPS in settings.")
+                    .setPositiveButton("Proceed", (dialog, which) ->
+                    {
+                        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                        {
+                            dialog.dismiss();
+                            validateTokenAndSwitchActivity();
+                        }
+                        else
+                        {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> finish());
+
+            alertDialogBuilder.create().show();
+        }
     }
 
     private void validateTokenAndSwitchActivity()
