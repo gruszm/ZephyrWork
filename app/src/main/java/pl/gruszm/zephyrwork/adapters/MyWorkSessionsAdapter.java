@@ -56,6 +56,7 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
 
     // List of Work Sessions
     private List<WorkSessionDTO> workSessionDTOs;
+    private List<WorkSessionDTO> filteredWorkSessionDTOs;
 
     // Work Session State Display
     private Map<WorkSessionState, String> workSessionNames;
@@ -87,6 +88,7 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
         okHttpClient = new OkHttpClient();
         sharedPreferences = activity.getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         workSessionDTOs = new ArrayList<>();
+        filteredWorkSessionDTOs = new ArrayList<>();
         formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
         // Retrieve Work Sessions
@@ -126,6 +128,7 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
                     }.getType();
 
                     workSessionDTOs = gson.fromJson(response.body().string(), listOfWorkSessionDTOsType);
+                    filteredWorkSessionDTOs = workSessionDTOs;
 
                     activity.runOnUiThread(() ->
                     {
@@ -172,7 +175,7 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
     @Override
     public void onBindViewHolder(@NonNull WorkSessionViewHolder holder, int position)
     {
-        WorkSessionDTO workSessionDTO = workSessionDTOs.get(position);
+        WorkSessionDTO workSessionDTO = filteredWorkSessionDTOs.get(position);
 
         String startTime = "Start: " + LocalDateTime.parse(workSessionDTO.getStartTime()).format(formatter).toString();
         String endTime = "";
@@ -198,36 +201,37 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
     @Override
     public int getItemCount()
     {
-        return workSessionDTOs.size();
+        return filteredWorkSessionDTOs.size();
     }
 
     @Override
     public void removeWorkSession(int workSessionId)
     {
-        List<WorkSessionDTO> workSessionToRemove = workSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
+        List<WorkSessionDTO> workSessionToRemove = filteredWorkSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
 
         if (workSessionToRemove.size() == 0)
         {
             return;
         }
 
-        int positionToRemove = workSessionDTOs.indexOf(workSessionToRemove.get(0));
+        int positionToRemove = filteredWorkSessionDTOs.indexOf(workSessionToRemove.get(0));
 
-        workSessionDTOs.remove(positionToRemove);
+        WorkSessionDTO workSessionRemoved = filteredWorkSessionDTOs.remove(positionToRemove);
+        workSessionDTOs.remove(workSessionRemoved);
         activity.runOnUiThread(() -> notifyItemRemoved(positionToRemove));
     }
 
     @Override
     public void updateWorkSessionState(int workSessionId, WorkSessionState workSessionState)
     {
-        List<WorkSessionDTO> workSessionToUpdate = workSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
+        List<WorkSessionDTO> workSessionToUpdate = filteredWorkSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
 
         if (workSessionToUpdate.size() == 0)
         {
             return;
         }
 
-        int positionToUpdate = workSessionDTOs.indexOf(workSessionToUpdate.get(0));
+        int positionToUpdate = filteredWorkSessionDTOs.indexOf(workSessionToUpdate.get(0));
 
         workSessionToUpdate.get(0).setWorkSessionState(workSessionState);
         activity.runOnUiThread(() -> notifyItemChanged(positionToUpdate));
@@ -236,16 +240,33 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
     @Override
     public void updateNotesFromEmployee(int workSessionId, String notesFromEmployee)
     {
-        List<WorkSessionDTO> workSessionToUpdate = workSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
+        List<WorkSessionDTO> workSessionToUpdate = filteredWorkSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
 
         if (workSessionToUpdate.size() == 0)
         {
             return;
         }
 
-        int positionToUpdate = workSessionDTOs.indexOf(workSessionToUpdate.get(0));
+        int positionToUpdate = filteredWorkSessionDTOs.indexOf(workSessionToUpdate.get(0));
 
         workSessionToUpdate.get(0).setNotesFromEmployee(notesFromEmployee);
         activity.runOnUiThread(() -> notifyItemChanged(positionToUpdate));
+    }
+
+    public void setFilter(WorkSessionState workSessionState)
+    {
+        if (workSessionState == null)
+        {
+            filteredWorkSessionDTOs = workSessionDTOs;
+        }
+        else
+        {
+            filteredWorkSessionDTOs = workSessionDTOs
+                    .stream()
+                    .filter(ws -> (ws.getWorkSessionState() == workSessionState))
+                    .collect(Collectors.toList());
+        }
+
+        activity.runOnUiThread(() -> notifyDataSetChanged());
     }
 }
