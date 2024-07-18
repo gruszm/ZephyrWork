@@ -3,11 +3,14 @@ package pl.gruszm.zephyrwork.activities;
 import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -197,6 +200,53 @@ public class WorkSessionActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    private boolean ensureGpsIsActive()
+    {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("GPS provider is disabled")
+                    .setMessage("This application requires an active GPS provider. Please enable GPS in settings.")
+                    .setPositiveButton("Settings", (dialog, which) ->
+                    {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+            alertDialogBuilder.create().show();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean ensureNotificationsAreEnabled()
+    {
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) && (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED))
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("Notifications are disabled")
+                    .setMessage("This application requires sending notifications. Please enable them in settings.")
+                    .setPositiveButton("Settings", (dialog, which) ->
+                    {
+                        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                        intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+            alertDialogBuilder.create().show();
+
+            return false;
+        }
+
+        return true;
+    }
+
     private void startWorkSessionOnClickListener(View view)
     {
         // Check permissions for location
@@ -209,14 +259,12 @@ public class WorkSessionActivity extends AppCompatActivity
         }
 
         // Check permissions for notifications for Android 13 and newer
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) && (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED))
+        if (!ensureNotificationsAreEnabled())
         {
-            requestPermissions(Arrays.asList(Manifest.permission.POST_NOTIFICATIONS).toArray(new String[0]), AppConfig.NOTIFICATIONS_CODE);
-
             return;
         }
 
-        if (callLock == true)
+        if ((!ensureGpsIsActive()) || callLock)
         {
             return;
         }
