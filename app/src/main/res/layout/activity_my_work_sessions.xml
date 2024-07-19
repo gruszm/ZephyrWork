@@ -35,7 +35,9 @@
                 android:text="ALL"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/filter_in_progress" />
+                app:layout_constraintRight_toLeftOf="@id/filter_in_progress"
+                style="@style/FiltersStyle"
+                android:layout_marginLeft="32dp" />
 
             <TextView
                 android:id="@+id/filter_in_progress"
@@ -44,7 +46,9 @@
                 android:text="IN PROGRESS"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/filter_all"
-                app:layout_constraintRight_toLeftOf="@id/filter_under_review" />
+                app:layout_constraintRight_toLeftOf="@id/filter_under_review"
+                android:textColor="@color/yellow"
+                style="@style/FiltersStyle" />
 
             <TextView
                 android:id="@+id/filter_under_review"
@@ -53,7 +57,9 @@
                 android:text="UNDER REVIEW"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/filter_in_progress" />
+                app:layout_constraintLeft_toRightOf="@id/filter_in_progress"
+                android:textColor="@color/blue"
+                style="@style/FiltersStyle" />
 
             <TextView
                 android:id="@+id/filter_approved"
@@ -62,7 +68,9 @@
                 android:text="APPROVED"
                 app:layout_constraintTop_toBottomOf="@id/filter_in_progress"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/filter_returned" />
+                app:layout_constraintRight_toLeftOf="@id/filter_returned"
+                android:textColor="@color/green"
+                style="@style/FiltersStyle" />
 
             <TextView
                 android:id="@+id/filter_returned"
@@ -71,7 +79,9 @@
                 android:text="RETURNED"
                 app:layout_constraintTop_toBottomOf="@id/filter_in_progress"
                 app:layout_constraintLeft_toRightOf="@id/filter_approved"
-                app:layout_constraintRight_toLeftOf="@id/filter_cancelled" />
+                app:layout_constraintRight_toLeftOf="@id/filter_cancelled"
+                android:textColor="@color/magenta"
+                style="@style/FiltersStyle" />
 
             <TextView
                 android:id="@+id/filter_cancelled"
@@ -80,7 +90,9 @@
                 android:text="CANCELLED"
                 app:layout_constraintTop_toBottomOf="@id/filter_in_progress"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/filter_returned" />
+                app:layout_constraintLeft_toRightOf="@id/filter_returned"
+                android:textColor="@color/red"
+                style="@style/FiltersStyle" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"

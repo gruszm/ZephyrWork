@@ -61,7 +61,7 @@ public class MyWorkSessionsActivity extends AppCompatActivity
         filterReturnedTv = findViewById(R.id.filter_returned);
         filterCancelledTv = findViewById(R.id.filter_cancelled);
 
-        filterAllTv.setOnClickListener((v) -> adapter.setFilter(null));
+        filterAllTv.setOnClickListener(new FilterOnClickListener(null));
         filterInProgressTv.setOnClickListener(new FilterOnClickListener(WorkSessionState.IN_PROGRESS));
         filterUnderReviewTv.setOnClickListener(new FilterOnClickListener(WorkSessionState.UNDER_REVIEW));
         filterApprovedTv.setOnClickListener(new FilterOnClickListener(WorkSessionState.APPROVED));
