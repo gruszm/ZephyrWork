@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -57,6 +58,9 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
     // List of Work Sessions
     private List<WorkSessionDTO> workSessionDTOs;
     private List<WorkSessionDTO> filteredWorkSessionDTOs;
+    private WorkSessionState workSessionFilter;
+    private LocalDateTime startingDateFilter;
+    private LocalDateTime endingDateFilter;
 
     // Work Session State Display
     private Map<WorkSessionState, String> workSessionNames;
@@ -253,20 +257,47 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
         activity.runOnUiThread(() -> notifyItemChanged(positionToUpdate));
     }
 
-    public void setFilter(WorkSessionState workSessionState)
+    public void setWorkSessionFilter(WorkSessionState workSessionFilter)
     {
-        if (workSessionState == null)
-        {
-            filteredWorkSessionDTOs = workSessionDTOs;
-        }
-        else
-        {
-            filteredWorkSessionDTOs = workSessionDTOs
-                    .stream()
-                    .filter(ws -> (ws.getWorkSessionState() == workSessionState))
-                    .collect(Collectors.toList());
-        }
+        this.workSessionFilter = workSessionFilter;
+
+        applyFilters();
+    }
+
+    public void setStartingDateFilter(int year, int month, int dayOfMonth)
+    {
+        LocalDateTime startingDateFilter = LocalDateTime.of(year, month + 1, dayOfMonth, 0, 0);
+        this.startingDateFilter = startingDateFilter;
+
+        applyFilters();
+    }
+
+    public void setEndingDateFilter(int year, int month, int dayOfMonth)
+    {
+        LocalDateTime endingDateFilter = LocalDateTime.of(year, month + 1, dayOfMonth, 23, 59);
+        this.endingDateFilter = endingDateFilter;
+
+        applyFilters();
+    }
+
+    private void applyFilters()
+    {
+        Stream<WorkSessionDTO> stream = workSessionDTOs.stream();
+
+        stream = (this.workSessionFilter != null) ? (stream.filter(ws -> ws.getWorkSessionState().equals(this.workSessionFilter))) : stream;
+        stream = (this.startingDateFilter != null) ? (stream.filter(ws -> LocalDateTime.parse(ws.getStartTime()).isAfter(this.startingDateFilter))) : stream;
+        stream = (this.endingDateFilter != null) ? (stream.filter(ws -> LocalDateTime.parse(ws.getStartTime()).isBefore(this.endingDateFilter))) : stream;
+
+        filteredWorkSessionDTOs = stream.collect(Collectors.toList());
 
         activity.runOnUiThread(() -> notifyDataSetChanged());
+    }
+
+    public void clearDatesFilter()
+    {
+        startingDateFilter = null;
+        endingDateFilter = null;
+
+        applyFilters();
     }
 }

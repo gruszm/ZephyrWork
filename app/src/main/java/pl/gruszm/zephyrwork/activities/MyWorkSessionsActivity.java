@@ -2,8 +2,10 @@ package pl.gruszm.zephyrwork.activities;
 
 import static pl.gruszm.zephyrwork.enums.RoleType.EMPLOYEE;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -16,6 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.Calendar;
 
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.adapters.MyWorkSessionsAdapter;
@@ -35,7 +39,9 @@ public class MyWorkSessionsActivity extends AppCompatActivity
     private ActionBarDrawerToggle toggle;
     private Toolbar toolbar;
     private NavigationView navigationView;
-    private TextView filterAllTv, filterInProgressTv, filterUnderReviewTv, filterApprovedTv, filterReturnedTv, filterCancelledTv;
+    private TextView filterAllTv, filterInProgressTv, filterUnderReviewTv, filterApprovedTv,
+            filterReturnedTv, filterCancelledTv, startingDateTv, endingDateTv;
+    private ImageButton clearDatesFilterBtn;
 
     // Navigation Header Views
     private TextView navFirstNameAndLastName, navEmail;
@@ -53,13 +59,16 @@ public class MyWorkSessionsActivity extends AppCompatActivity
         toolbar = findViewById(R.id.toolbar);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
-        // Filter TextViews
+        // Filter TextViews/ImageButtons
         filterAllTv = findViewById(R.id.filter_all);
         filterInProgressTv = findViewById(R.id.filter_in_progress);
         filterUnderReviewTv = findViewById(R.id.filter_under_review);
         filterApprovedTv = findViewById(R.id.filter_approved);
         filterReturnedTv = findViewById(R.id.filter_returned);
         filterCancelledTv = findViewById(R.id.filter_cancelled);
+        startingDateTv = findViewById(R.id.starting_date);
+        endingDateTv = findViewById(R.id.ending_date);
+        clearDatesFilterBtn = findViewById(R.id.clear_date_button);
 
         filterAllTv.setOnClickListener(new FilterOnClickListener(null));
         filterInProgressTv.setOnClickListener(new FilterOnClickListener(WorkSessionState.IN_PROGRESS));
@@ -67,6 +76,9 @@ public class MyWorkSessionsActivity extends AppCompatActivity
         filterApprovedTv.setOnClickListener(new FilterOnClickListener(WorkSessionState.APPROVED));
         filterReturnedTv.setOnClickListener(new FilterOnClickListener(WorkSessionState.RETURNED));
         filterCancelledTv.setOnClickListener(new FilterOnClickListener(WorkSessionState.CANCELLED));
+        startingDateTv.setOnClickListener(this::startingDateOnClickListener);
+        endingDateTv.setOnClickListener(this::endingDateOnClickListener);
+        clearDatesFilterBtn.setOnClickListener(this::clearDatesFilterOnClickListener);
 
         // Configure navigation
         setSupportActionBar(toolbar);
@@ -130,7 +142,56 @@ public class MyWorkSessionsActivity extends AppCompatActivity
         @Override
         public void onClick(View v)
         {
-            adapter.setFilter(workSessionState);
+            adapter.setWorkSessionFilter(workSessionState);
         }
+    }
+
+    private void startingDateOnClickListener(View v)
+    {
+        Calendar calendar = Calendar.getInstance();
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) ->
+                {
+                    adapter.setStartingDateFilter(year, month, dayOfMonth);
+                    clearDatesFilterBtn.setVisibility(View.VISIBLE);
+                    startingDateTv.setText(String.format("Starting date\n%04d-%02d-%02d", year, month + 1, dayOfMonth));
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        datePickerDialog.show();
+    }
+
+    private void endingDateOnClickListener(View v)
+    {
+        Calendar calendar = Calendar.getInstance();
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) ->
+                {
+                    adapter.setEndingDateFilter(year, month, dayOfMonth);
+                    clearDatesFilterBtn.setVisibility(View.VISIBLE);
+                    endingDateTv.setText(String.format("Ending date\n%04d-%02d-%02d", year, month + 1, dayOfMonth));
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        datePickerDialog.show();
+    }
+
+
+    private void clearDatesFilterOnClickListener(View view)
+    {
+        adapter.clearDatesFilter();
+        clearDatesFilterBtn.setVisibility(View.INVISIBLE);
+        startingDateTv.setText("Starting date");
+        endingDateTv.setText("Ending date");
     }
 }
