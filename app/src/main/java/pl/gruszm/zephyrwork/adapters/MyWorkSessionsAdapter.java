@@ -239,6 +239,8 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
 
         workSessionToUpdate.get(0).setWorkSessionState(workSessionState);
         activity.runOnUiThread(() -> notifyItemChanged(positionToUpdate));
+
+        applyFilters();
     }
 
     @Override
@@ -254,6 +256,23 @@ public class MyWorkSessionsAdapter extends RecyclerView.Adapter<WorkSessionViewH
         int positionToUpdate = filteredWorkSessionDTOs.indexOf(workSessionToUpdate.get(0));
 
         workSessionToUpdate.get(0).setNotesFromEmployee(notesFromEmployee);
+        activity.runOnUiThread(() -> notifyItemChanged(positionToUpdate));
+    }
+
+    @Override
+    public void updateNotesFromSupervisor(int workSessionId, String notesFromSupervisor)
+    {
+        List<WorkSessionDTO> workSessionToUpdate = filteredWorkSessionDTOs.stream().filter(ws -> (ws.getId() == workSessionId)).collect(Collectors.toList());
+
+        if (workSessionToUpdate.size() == 0)
+        {
+            return;
+        }
+
+        int positionToUpdate = filteredWorkSessionDTOs.indexOf(workSessionToUpdate.get(0));
+
+        workSessionToUpdate.get(0).setNotesFromSupervisor(notesFromSupervisor);
+        workSessionToUpdate.get(0).setNotesFromEmployee(null);
         activity.runOnUiThread(() -> notifyItemChanged(positionToUpdate));
     }
 
