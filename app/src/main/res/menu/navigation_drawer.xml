@@ -40,6 +40,7 @@
 
                 <item
                     android:id="@+id/my_subordinates"
+                    android:icon="@drawable/round_people_24"
                     android:title="My subordinates" />
 
             </group>
