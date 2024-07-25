@@ -55,9 +55,37 @@
         app:layout_constraintTop_toBottomOf="@id/employee_role"
         android:inputType="number"
         android:textSize="14sp"
-        android:text="TEST" />
+        android:text="TEST"
+        android:imeOptions="actionDone" />
 
+    <CheckBox
+        android:id="@+id/force_start_work_session_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/employee_location_registration_interval"
+        android:text="Force start work session" />
 
+    <TextView
+        android:id="@+id/starting_hour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/force_start_work_session_checkbox"
+        android:text="00:00"
+        android:background="@drawable/filter_background"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/ending_hour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/starting_hour"
+        app:layout_constraintTop_toTopOf="@id/starting_hour"
+        android:layout_marginLeft="80dp"
+        android:text="23:59"
+        android:background="@drawable/filter_background"
+        android:padding="8dp" />
 
     <ImageButton
         android:id="@+id/save_interval_button"

@@ -9,6 +9,11 @@ public class UserDTO
     private Integer supervisorId;
     private String roleName;
     private int locationRegistrationInterval;
+    private int startingHour;
+    private int startingMinute;
+    private int endingHour;
+    private int endingMinute;
+    private boolean forceStartWorkSession;
 
     public int getId()
     {
@@ -106,6 +111,66 @@ public class UserDTO
     public UserDTO setLocationRegistrationInterval(int locationRegistrationInterval)
     {
         this.locationRegistrationInterval = locationRegistrationInterval;
+
+        return this;
+    }
+
+    public int getStartingHour()
+    {
+        return startingHour;
+    }
+
+    public UserDTO setStartingHour(int startingHour)
+    {
+        this.startingHour = startingHour;
+
+        return this;
+    }
+
+    public int getStartingMinute()
+    {
+        return startingMinute;
+    }
+
+    public UserDTO setStartingMinute(int startingMinute)
+    {
+        this.startingMinute = startingMinute;
+
+        return this;
+    }
+
+    public int getEndingHour()
+    {
+        return endingHour;
+    }
+
+    public UserDTO setEndingHour(int endingHour)
+    {
+        this.endingHour = endingHour;
+
+        return this;
+    }
+
+    public int getEndingMinute()
+    {
+        return endingMinute;
+    }
+
+    public UserDTO setEndingMinute(int endingMinute)
+    {
+        this.endingMinute = endingMinute;
+
+        return this;
+    }
+
+    public boolean isForceStartWorkSession()
+    {
+        return forceStartWorkSession;
+    }
+
+    public UserDTO setForceStartWorkSession(boolean forceStartWorkSession)
+    {
+        this.forceStartWorkSession = forceStartWorkSession;
 
         return this;
     }

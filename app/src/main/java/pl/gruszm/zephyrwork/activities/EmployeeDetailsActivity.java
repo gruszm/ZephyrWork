@@ -1,11 +1,12 @@
 package pl.gruszm.zephyrwork.activities;
 
+import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -20,19 +21,26 @@ import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import pl.gruszm.zephyrwork.DTOs.SubordinateEmpDataDTO;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
 
 public class EmployeeDetailsActivity extends AppCompatActivity
 {
+    public static final int MIN_INTERVAL = 5;
+
     private UserDTO userDTO;
-    private TextView employeeIdTv, email, firstName, lastName, role;
+    private TextView employeeIdTv, email, firstName, lastName, role, startingHourTv, endingHourTv;
     private EditText intervalEt;
-    private ImageButton saveIntervalBtn;
+    private ImageButton saveBtn;
+    private SubordinateEmpDataDTO subordinateEmpDataDTO;
+    private CheckBox forceStartWorkSessionCheckbox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -45,8 +53,11 @@ public class EmployeeDetailsActivity extends AppCompatActivity
         firstName = findViewById(R.id.employee_first_name);
         lastName = findViewById(R.id.employee_last_name);
         role = findViewById(R.id.employee_role);
-        saveIntervalBtn = findViewById(R.id.save_interval_button);
+        saveBtn = findViewById(R.id.save_interval_button);
         intervalEt = findViewById(R.id.employee_location_registration_interval);
+        startingHourTv = findViewById(R.id.starting_hour);
+        endingHourTv = findViewById(R.id.ending_hour);
+        forceStartWorkSessionCheckbox = findViewById(R.id.force_start_work_session_checkbox);
 
         if (savedInstanceState == null)
         {
@@ -60,10 +71,31 @@ public class EmployeeDetailsActivity extends AppCompatActivity
             lastName.setText(userDTO.getLastName());
             role.setText(userDTO.getRoleName());
             intervalEt.setText(String.valueOf(userDTO.getLocationRegistrationInterval()));
+            forceStartWorkSessionCheckbox.setChecked(userDTO.isForceStartWorkSession());
+
+            subordinateEmpDataDTO = new SubordinateEmpDataDTO(
+                    userDTO.getStartingHour(),
+                    userDTO.getStartingMinute(),
+                    userDTO.getEndingHour(),
+                    userDTO.getEndingMinute(),
+                    userDTO.getLocationRegistrationInterval(),
+                    userDTO.isForceStartWorkSession()
+            );
+
+            startingHourTv.setText(String.format("%02d:%02d", subordinateEmpDataDTO.getStartingHour(), subordinateEmpDataDTO.getStartingMinute()));
+            endingHourTv.setText(String.format("%02d:%02d", subordinateEmpDataDTO.getEndingHour(), subordinateEmpDataDTO.getEndingMinute()));
         }
 
-        saveIntervalBtn.setVisibility(View.GONE);
-        saveIntervalBtn.setOnClickListener(this::saveIntervalOnClickListener);
+        startingHourTv.setOnClickListener(this::startingHourOnClickListener);
+        endingHourTv.setOnClickListener(this::endingHourOnClickListener);
+        saveBtn.setOnClickListener(this::saveOnClickListener);
+        saveBtn.setVisibility(View.GONE);
+
+        forceStartWorkSessionCheckbox.setOnCheckedChangeListener((buttonView, isChecked) ->
+        {
+            subordinateEmpDataDTO.setForceStartWorkSession(isChecked);
+            saveBtn.setVisibility(View.VISIBLE);
+        });
 
         intervalEt.addTextChangedListener(new TextWatcher()
         {
@@ -76,32 +108,96 @@ public class EmployeeDetailsActivity extends AppCompatActivity
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
             {
-                saveIntervalBtn.setVisibility(View.VISIBLE);
+
             }
 
             @Override
             public void afterTextChanged(Editable editable)
             {
+                int newInterval = (editable.toString().isEmpty()) ? 0 : Integer.parseInt(editable.toString());
 
+                subordinateEmpDataDTO.setLocationRegistrationInterval(newInterval);
+                saveBtn.setVisibility(View.VISIBLE);
             }
         });
     }
 
-    private void saveIntervalOnClickListener(View view)
+    private void startingHourOnClickListener(View view)
     {
-        if (intervalEt.getText().toString().isEmpty())
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                this,
+                (view1, hourOfDay, minute) ->
+                {
+                    String[] endingHoursAndMinutes = endingHourTv.getText().toString().split(":");
+                    int endingHour = Integer.parseInt(endingHoursAndMinutes[0]);
+                    int endingMinute = Integer.parseInt(endingHoursAndMinutes[1]);
+
+                    if ((hourOfDay > endingHour) || ((hourOfDay == endingHour) && (minute >= endingMinute)))
+                    {
+                        Toast.makeText(this, "Starting time must be before ending time.", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        startingHourTv.setText(String.format("%02d:%02d", hourOfDay, minute));
+                        saveBtn.setVisibility(View.VISIBLE);
+                        subordinateEmpDataDTO.setStartingHour(hourOfDay);
+                        subordinateEmpDataDTO.setStartingMinute(minute);
+                    }
+                },
+                userDTO.getStartingHour(),
+                userDTO.getStartingMinute(),
+                true);
+
+        timePickerDialog.show();
+    }
+
+    private void endingHourOnClickListener(View view)
+    {
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                this,
+                (view1, hourOfDay, minute) ->
+                {
+                    String[] startingHoursAndMinutes = startingHourTv.getText().toString().split(":");
+                    int startingHour = Integer.parseInt(startingHoursAndMinutes[0]);
+                    int startingMinute = Integer.parseInt(startingHoursAndMinutes[1]);
+
+                    if ((hourOfDay < startingHour) || ((hourOfDay == startingHour) && (minute <= startingMinute)))
+                    {
+                        Toast.makeText(this, "Ending time must be after starting time.", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        endingHourTv.setText(String.format("%02d:%02d", hourOfDay, minute));
+                        saveBtn.setVisibility(View.VISIBLE);
+                        subordinateEmpDataDTO.setEndingHour(hourOfDay);
+                        subordinateEmpDataDTO.setEndingMinute(minute);
+                    }
+                },
+                userDTO.getEndingHour(),
+                userDTO.getEndingMinute(),
+                true);
+
+        timePickerDialog.show();
+    }
+
+    private void saveOnClickListener(View view)
+    {
+        if (intervalEt.getText().toString().isEmpty() || (Integer.parseInt(intervalEt.getText().toString()) < MIN_INTERVAL))
         {
+            Toast.makeText(this, "Interval cannot be lower than " + MIN_INTERVAL, Toast.LENGTH_SHORT).show();
+
             return;
         }
 
+        Gson gson = new Gson();
         SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        RequestBody requestBody = RequestBody.create(gson.toJson(subordinateEmpDataDTO), MediaType.get("application/json"));
+
         Request request = new Request.Builder()
-                .get()
+                .put(requestBody)
                 .url(AppConfig.BACKEND_BASE
-                        .concat("/users/subordinates/interval/")
-                        .concat(String.valueOf(userDTO.getId()))
-                        .concat("/")
-                        .concat(intervalEt.getText().toString()))
+                        .concat("/users/subordinates/update/")
+                        .concat(String.valueOf(userDTO.getId())))
                 .header("Auth", sharedPreferences.getString("Auth", ""))
                 .build();
         Call call = new OkHttpClient().newCall(request);
@@ -121,8 +217,8 @@ public class EmployeeDetailsActivity extends AppCompatActivity
                 {
                     runOnUiThread(() ->
                     {
-                        saveIntervalBtn.setVisibility(View.GONE);
-                        Toast.makeText(EmployeeDetailsActivity.this, "Saved new value of interval.", Toast.LENGTH_SHORT).show();
+                        saveBtn.setVisibility(View.GONE);
+                        Toast.makeText(EmployeeDetailsActivity.this, "Subordinate employee updated.", Toast.LENGTH_SHORT).show();
                     });
                 }
                 else
