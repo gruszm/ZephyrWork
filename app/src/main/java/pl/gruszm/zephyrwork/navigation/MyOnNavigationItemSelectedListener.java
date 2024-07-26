@@ -104,6 +104,9 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
             else if (!activityClassName.equals(SubordinatesListActivity.class.getName()))
             {
                 Intent intent = new Intent(activity, SubordinatesListActivity.class);
+                intent.putExtra("user_role", userRole);
+                intent.putExtra("nav_first_and_last_name", firstNameAndLastName);
+                intent.putExtra("email", email);
 
                 activity.startActivity(intent);
             }

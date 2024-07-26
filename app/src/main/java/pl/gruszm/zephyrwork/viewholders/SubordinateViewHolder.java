@@ -23,6 +23,7 @@ public class SubordinateViewHolder extends RecyclerView.ViewHolder
     private TextView firstName, lastName, email;
     private ImageButton details;
     private OnSubordinateDetailsClickCallback onSubordinateDetailsClickCallback;
+    private String supervisorRole, supervisorFirstAndLastName, supervisorEmail;
 
     public SubordinateViewHolder(@NonNull View itemView)
     {
@@ -41,9 +42,19 @@ public class SubordinateViewHolder extends RecyclerView.ViewHolder
         Gson gson = new Gson();
         Intent intent = new Intent(activity, EmployeeDetailsActivity.class);
         intent.putExtra("UserDTO", gson.toJson(userDTO));
+        intent.putExtra("supervisor_role", supervisorRole);
+        intent.putExtra("supervisor_first_and_last_name", supervisorFirstAndLastName);
+        intent.putExtra("supervisor_email", supervisorEmail);
 
         onSubordinateDetailsClickCallback.vanishSubordinatesList();
         activity.startActivity(intent);
+    }
+
+    public void setNavigationData(String supervisorRole, String supervisorFirstAndLastName, String supervisorEmail)
+    {
+        this.supervisorRole = supervisorRole;
+        this.supervisorFirstAndLastName = supervisorFirstAndLastName;
+        this.supervisorEmail = supervisorEmail;
     }
 
     public void setActivity(Activity activity)
