@@ -9,8 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -96,6 +98,7 @@ public class SubordinatesListAdapter extends RecyclerView.Adapter<SubordinateVie
             hashMap.put(dto, count.get());
         });
 
+        Optional<Integer> hashMapMaxValue = hashMap.values().stream().max(Comparator.naturalOrder());
         displayedUserDTOs = hashMap.entrySet().stream().sorted((o1, o2) ->
                 {
                     if (o1.getValue() < o2.getValue())
@@ -111,7 +114,7 @@ public class SubordinatesListAdapter extends RecyclerView.Adapter<SubordinateVie
                         return 0;
                     }
                 })
-                .filter(entry -> entry.getValue() > 0)
+                .filter(entry -> entry.getValue() == hashMapMaxValue.get())
                 .map(entry -> entry.getKey())
                 .collect(Collectors.toList());
 
