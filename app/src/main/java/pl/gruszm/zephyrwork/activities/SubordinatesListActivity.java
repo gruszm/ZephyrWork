@@ -7,7 +7,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.google.gson.Gson;
@@ -33,6 +36,8 @@ public class SubordinatesListActivity extends AppCompatActivity implements OnSub
 {
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
+    private SubordinatesListAdapter subordinatesListAdapter;
+    private EditText searchBarEt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -42,7 +47,29 @@ public class SubordinatesListActivity extends AppCompatActivity implements OnSub
 
         progressBar = findViewById(R.id.progress_bar);
         recyclerView = findViewById(R.id.recycler_view);
+        searchBarEt = findViewById(R.id.search_bar);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        searchBarEt.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                subordinatesListAdapter.searchForEmployee(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+
+            }
+        });
 
         retrieveSubordinates();
     }
@@ -84,7 +111,7 @@ public class SubordinatesListActivity extends AppCompatActivity implements OnSub
                     {
                     }.getType();
                     List<UserDTO> userDTOs = gson.fromJson(response.body().string(), userDTOListType);
-                    SubordinatesListAdapter subordinatesListAdapter = new SubordinatesListAdapter(SubordinatesListActivity.this, userDTOs, SubordinatesListActivity.this);
+                    subordinatesListAdapter = new SubordinatesListAdapter(SubordinatesListActivity.this, userDTOs, SubordinatesListActivity.this);
                     runOnUiThread(() ->
                     {
                         progressBar.setVisibility(View.GONE);

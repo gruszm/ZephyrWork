@@ -63,6 +63,9 @@ public class SubordinatesListAdapter extends RecyclerView.Adapter<SubordinateVie
         if (searchPhrase.isEmpty())
         {
             displayedUserDTOs = userDTOs;
+            notifyDataSetChanged();
+
+            return;
         }
 
         String[] searchKeyWords = searchPhrase.split(" ");
@@ -70,13 +73,12 @@ public class SubordinatesListAdapter extends RecyclerView.Adapter<SubordinateVie
 
         userDTOs.forEach(dto ->
         {
+            String firstNameAndLastName = (dto.getFirstName() + " " + dto.getLastName()).toLowerCase();
             AtomicInteger count = new AtomicInteger(0);
 
             Arrays.stream(searchKeyWords).forEach(kw ->
             {
-                String firstNameAndLastName = dto.getFirstName() + " " + dto.getLastName();
-
-                if (firstNameAndLastName.contains(kw))
+                if (firstNameAndLastName.contains(kw.toLowerCase()))
                 {
                     count.incrementAndGet();
                 }
@@ -89,18 +91,21 @@ public class SubordinatesListAdapter extends RecyclerView.Adapter<SubordinateVie
                 {
                     if (o1.getValue() < o2.getValue())
                     {
-                        return -1;
+                        return 1;
                     }
                     else if (o1.getValue() > o2.getValue())
                     {
-                        return 1;
+                        return -1;
                     }
                     else
                     {
                         return 0;
                     }
                 })
-                .collect(Collectors.toList()).stream().map(entry -> entry.getKey())
+                .filter(entry -> entry.getValue() > 0)
+                .map(entry -> entry.getKey())
                 .collect(Collectors.toList());
+
+        notifyDataSetChanged();
     }
 }
