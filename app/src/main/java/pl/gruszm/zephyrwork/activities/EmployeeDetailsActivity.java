@@ -13,8 +13,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -30,6 +35,8 @@ import pl.gruszm.zephyrwork.DTOs.SubordinateEmpDataDTO;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
+import pl.gruszm.zephyrwork.enums.RoleType;
+import pl.gruszm.zephyrwork.navigation.MyOnNavigationItemSelectedListener;
 
 public class EmployeeDetailsActivity extends AppCompatActivity
 {
@@ -42,11 +49,27 @@ public class EmployeeDetailsActivity extends AppCompatActivity
     private SubordinateEmpDataDTO subordinateEmpDataDTO;
     private CheckBox forceStartWorkSessionCheckbox;
 
+    // Layout
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle toggle;
+    private Toolbar toolbar;
+    private NavigationView navigationView;
+
+    // Navigation Header Views
+    private TextView navFirstNameAndLastName, navEmail;
+    private String supervisorRole;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employee_details);
+
+        // Layout
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        toolbar = findViewById(R.id.toolbar);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
         employeeIdTv = findViewById(R.id.employee_id);
         email = findViewById(R.id.employee_email);
@@ -120,6 +143,46 @@ public class EmployeeDetailsActivity extends AppCompatActivity
                 saveBtn.setVisibility(View.VISIBLE);
             }
         });
+
+        // Configure navigation
+        setSupportActionBar(toolbar);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // Navigation Header Views
+        navFirstNameAndLastName = navigationView.getHeaderView(0).findViewById(R.id.nav_header_name);
+        navEmail = navigationView.getHeaderView(0).findViewById(R.id.nav_header_email);
+
+        // Toolbar and navigation handling
+        if (savedInstanceState == null)
+        {
+            Bundle extras = getIntent().getExtras();
+            supervisorRole = extras.getString("supervisor_role", RoleType.MANAGER.name());
+            navFirstNameAndLastName.setText(extras.getString("supervisor_first_and_last_name", ""));
+            navEmail.setText(extras.getString("supervisor_email", ""));
+        }
+
+        MyOnNavigationItemSelectedListener itemSelectedListener = new MyOnNavigationItemSelectedListener(
+                this,
+                supervisorRole,
+                navFirstNameAndLastName.getText().toString(),
+                navEmail.getText().toString(),
+                drawerLayout
+        );
+        toolbar.setNavigationOnClickListener(this::navigationOnClickListener);
+        navigationView.setNavigationItemSelectedListener(itemSelectedListener);
+    }
+
+    private void navigationOnClickListener(View view)
+    {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START))
+        {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
+        else
+        {
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
     }
 
     private void startingHourOnClickListener(View view)

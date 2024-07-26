@@ -20,12 +20,20 @@ public class SubordinatesListAdapter extends RecyclerView.Adapter<SubordinateVie
     private Activity activity;
     private List<UserDTO> userDTOs;
     private OnSubordinateDetailsClickCallback onSubordinateDetailsClickCallback;
+    private String supervisorRole, supervisorFirstAndLastName, supervisorEmail;
 
     public SubordinatesListAdapter(Activity activity, List<UserDTO> userDTOs, OnSubordinateDetailsClickCallback onSubordinateDetailsClickCallback)
     {
         this.activity = activity;
         this.userDTOs = userDTOs;
         this.onSubordinateDetailsClickCallback = onSubordinateDetailsClickCallback;
+    }
+
+    public void setNavigationData(String supervisorRole, String supervisorFirstAndLastName, String supervisorEmail)
+    {
+        this.supervisorRole = supervisorRole;
+        this.supervisorFirstAndLastName = supervisorFirstAndLastName;
+        this.supervisorEmail = supervisorEmail;
     }
 
     @NonNull
@@ -44,6 +52,7 @@ public class SubordinatesListAdapter extends RecyclerView.Adapter<SubordinateVie
         holder.setDataUsingUserDTO(userDTOs.get(position));
         holder.setActivity(this.activity);
         holder.setOnSubordinateDetailsClickCallback(onSubordinateDetailsClickCallback);
+        holder.setNavigationData(supervisorRole, supervisorFirstAndLastName, supervisorEmail);
     }
 
     @Override
