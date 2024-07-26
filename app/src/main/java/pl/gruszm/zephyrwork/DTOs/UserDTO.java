@@ -1,5 +1,7 @@
 package pl.gruszm.zephyrwork.DTOs;
 
+import java.util.Objects;
+
 public class UserDTO
 {
     private int id;
@@ -173,5 +175,26 @@ public class UserDTO
         this.forceStartWorkSession = forceStartWorkSession;
 
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        UserDTO userDTO = (UserDTO) o;
+        return id == userDTO.id && locationRegistrationInterval == userDTO.locationRegistrationInterval && startingHour == userDTO.startingHour && startingMinute == userDTO.startingMinute && endingHour == userDTO.endingHour && endingMinute == userDTO.endingMinute && forceStartWorkSession == userDTO.forceStartWorkSession && Objects.equals(email, userDTO.email) && Objects.equals(firstName, userDTO.firstName) && Objects.equals(lastName, userDTO.lastName) && Objects.equals(supervisorId, userDTO.supervisorId) && Objects.equals(roleName, userDTO.roleName);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(id, email, firstName, lastName, supervisorId, roleName, locationRegistrationInterval, startingHour, startingMinute, endingHour, endingMinute, forceStartWorkSession);
     }
 }
