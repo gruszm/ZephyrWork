@@ -4,6 +4,7 @@ import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MS
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -39,6 +40,7 @@ import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
+import pl.gruszm.zephyrwork.enums.RoleType;
 import pl.gruszm.zephyrwork.navigation.MyOnNavigationItemSelectedListener;
 import pl.gruszm.zephyrwork.services.LocationSenderService;
 
@@ -49,6 +51,7 @@ public class WorkSessionActivity extends AppCompatActivity
     private Gson gson;
     private SharedPreferences sharedPreferences;
     private boolean callLock;
+    private boolean ceoAgreed;
 
     // Buttons
     private ImageButton startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn;
@@ -76,6 +79,7 @@ public class WorkSessionActivity extends AppCompatActivity
         gson = new Gson();
         sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         callLock = false;
+        ceoAgreed = false;
 
         // Layout
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -266,6 +270,26 @@ public class WorkSessionActivity extends AppCompatActivity
 
         if ((!ensureGpsIsActive()) || callLock)
         {
+            return;
+        }
+
+        if (userRole.equals(RoleType.CEO.name()) && !ceoAgreed)
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+            alertDialogBuilder.setTitle("You are the CEO!");
+            alertDialogBuilder.setMessage("Starting a work session will have no effect, since You are the CEO. Do you wish to start it anyway?");
+            alertDialogBuilder.setNegativeButton("NO", (dialog, which) -> dialog.dismiss());
+            alertDialogBuilder.setPositiveButton("YES", ((dialog, which) ->
+            {
+                ceoAgreed = true;
+
+                dialog.dismiss();
+                startWorkSessionOnClickListener(view);
+            }));
+
+            alertDialogBuilder.show();
+
             return;
         }
 

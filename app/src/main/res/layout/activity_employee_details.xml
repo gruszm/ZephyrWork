@@ -28,72 +28,94 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/employee_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/profile_icon"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:scaleType="fitCenter"
                 app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:text="TEST" />
+                android:layout_marginTop="24dp"
+                android:src="@drawable/round_person_24"
+                android:background="@drawable/circle_background"
+                android:backgroundTint="#BCC6C6C6"
+                android:padding="4dp" />
+
+            <TextView
+                android:id="@+id/personal_details"
+                android:text="PERSONAL DETAILS:"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/profile_icon"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="25dp"
+                style="@style/UserProfileStylePrimary" />
+
+            <TextView
+                android:id="@+id/employee_first_name_and_last_name"
+                app:layout_constraintLeft_toLeftOf="@id/personal_details"
+                app:layout_constraintTop_toBottomOf="@id/personal_details"
+                style="@style/UserProfileStyleSecondary" />
 
             <TextView
                 android:id="@+id/employee_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintLeft_toLeftOf="@id/employee_id"
-                app:layout_constraintTop_toBottomOf="@id/employee_id"
-                android:text="TEST" />
+                app:layout_constraintLeft_toLeftOf="@id/personal_details"
+                app:layout_constraintTop_toBottomOf="@id/employee_first_name_and_last_name"
+                android:autoSizeTextType="uniform"
+                android:maxLines="1"
+                style="@style/UserProfileStyleSecondary" />
 
             <TextView
-                android:id="@+id/employee_first_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/user_profile_role"
+                android:text="Role:"
                 app:layout_constraintLeft_toLeftOf="@id/employee_email"
                 app:layout_constraintTop_toBottomOf="@id/employee_email"
-                android:text="TEST" />
-
-            <TextView
-                android:id="@+id/employee_last_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintLeft_toLeftOf="@id/employee_first_name"
-                app:layout_constraintTop_toBottomOf="@id/employee_first_name"
-                android:text="TEST" />
+                style="@style/UserProfileStylePrimary" />
 
             <TextView
                 android:id="@+id/employee_role"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintLeft_toLeftOf="@id/employee_last_name"
-                app:layout_constraintTop_toBottomOf="@id/employee_last_name"
-                android:text="TEST" />
+                app:layout_constraintLeft_toLeftOf="@id/user_profile_role"
+                app:layout_constraintTop_toBottomOf="@id/user_profile_role"
+                style="@style/UserProfileStyleSecondary" />
 
-            <EditText
+            <TextView
                 android:id="@+id/employee_location_registration_interval"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:text="Interval:"
                 app:layout_constraintLeft_toLeftOf="@id/employee_role"
                 app:layout_constraintTop_toBottomOf="@id/employee_role"
+                style="@style/UserProfileStylePrimary" />
+
+            <EditText
+                android:id="@+id/employee_location_registration_interval_et"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@id/employee_location_registration_interval"
+                app:layout_constraintBottom_toBottomOf="@id/employee_location_registration_interval"
+                app:layout_constraintLeft_toRightOf="@id/employee_location_registration_interval"
                 android:inputType="number"
-                android:textSize="14sp"
-                android:text="TEST"
-                android:imeOptions="actionDone" />
+                android:textSize="20sp"
+                android:imeOptions="actionDone"
+                android:gravity="center" />
 
             <CheckBox
                 android:id="@+id/force_start_work_session_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/employee_location_registration_interval"
-                android:text="Force start work session" />
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/employee_location_registration_interval_et"
+                android:text="Force start work session"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/starting_hour"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/ending_hour"
                 app:layout_constraintTop_toBottomOf="@id/force_start_work_session_checkbox"
                 android:text="00:00"
+                android:textSize="20sp"
                 android:background="@drawable/filter_background"
                 android:padding="8dp" />
 
@@ -102,24 +124,40 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toRightOf="@id/starting_hour"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@id/starting_hour"
-                android:layout_marginLeft="80dp"
                 android:text="23:59"
+                android:textSize="20sp"
                 android:background="@drawable/filter_background"
                 android:padding="8dp" />
+
+            <ImageButton
+                android:id="@+id/delete_employee_button"
+                android:layout_width="84dp"
+                android:layout_height="84dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@drawable/round_person_remove_24"
+                android:background="@drawable/circle_background"
+                android:backgroundTint="#FF2C2C"
+                android:foreground="?actionBarItemBackground"
+                android:scaleType="fitCenter"
+                android:padding="12dp"
+                android:layout_margin="4dp" />
 
             <ImageButton
                 android:id="@+id/save_interval_button"
                 android:layout_width="84dp"
                 android:layout_height="84dp"
-                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
                 android:src="@drawable/outline_save_24"
                 android:background="@drawable/circle_background"
                 android:backgroundTint="#0099FF"
                 android:foreground="?actionBarItemBackground"
                 android:scaleType="fitCenter"
-                android:padding="4dp" />
+                android:padding="4dp"
+                android:layout_margin="4dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

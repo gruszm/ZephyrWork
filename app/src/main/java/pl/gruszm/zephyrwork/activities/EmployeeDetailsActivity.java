@@ -43,7 +43,7 @@ public class EmployeeDetailsActivity extends AppCompatActivity
     public static final int MIN_INTERVAL = 5;
 
     private UserDTO userDTO;
-    private TextView employeeIdTv, email, firstName, lastName, role, startingHourTv, endingHourTv;
+    private TextView email, firstNameAndLastName, role, startingHourTv, endingHourTv;
     private EditText intervalEt;
     private ImageButton saveBtn;
     private SubordinateEmpDataDTO subordinateEmpDataDTO;
@@ -71,13 +71,11 @@ public class EmployeeDetailsActivity extends AppCompatActivity
         toolbar = findViewById(R.id.toolbar);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
-        employeeIdTv = findViewById(R.id.employee_id);
         email = findViewById(R.id.employee_email);
-        firstName = findViewById(R.id.employee_first_name);
-        lastName = findViewById(R.id.employee_last_name);
+        firstNameAndLastName = findViewById(R.id.employee_first_name_and_last_name);
         role = findViewById(R.id.employee_role);
         saveBtn = findViewById(R.id.save_interval_button);
-        intervalEt = findViewById(R.id.employee_location_registration_interval);
+        intervalEt = findViewById(R.id.employee_location_registration_interval_et);
         startingHourTv = findViewById(R.id.starting_hour);
         endingHourTv = findViewById(R.id.ending_hour);
         forceStartWorkSessionCheckbox = findViewById(R.id.force_start_work_session_checkbox);
@@ -88,10 +86,8 @@ public class EmployeeDetailsActivity extends AppCompatActivity
 
             userDTO = new Gson().fromJson(extras.getString("UserDTO"), UserDTO.class);
 
-            employeeIdTv.setText(String.valueOf(userDTO.getId()));
             email.setText(userDTO.getEmail());
-            firstName.setText(userDTO.getFirstName());
-            lastName.setText(userDTO.getLastName());
+            firstNameAndLastName.setText(userDTO.getFirstName() + " " + userDTO.getLastName());
             role.setText(userDTO.getRoleName());
             intervalEt.setText(String.valueOf(userDTO.getLocationRegistrationInterval()));
             forceStartWorkSessionCheckbox.setChecked(userDTO.isForceStartWorkSession());
