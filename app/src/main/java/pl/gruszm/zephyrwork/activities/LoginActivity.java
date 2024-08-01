@@ -2,10 +2,13 @@ package pl.gruszm.zephyrwork.activities;
 
 import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
@@ -20,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -37,6 +41,7 @@ public class LoginActivity extends AppCompatActivity
     private boolean callLock;
     private EditText email, password;
     private ImageButton submitButton;
+    private boolean initiated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -52,16 +57,7 @@ public class LoginActivity extends AppCompatActivity
 
         submitButton.setOnClickListener(this::submitOnClickListener);
 
-        // When application is launched, check if GPS is active only once
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-        {
-            validateTokenAndSwitchActivity();
-        }
-        else
-        {
-            ensureGpsIsActive();
-        }
+        ensureLocationPermissionIsGranted();
     }
 
     @Override
@@ -69,7 +65,98 @@ public class LoginActivity extends AppCompatActivity
     {
         super.onResume();
 
-        ensureGpsIsActive();
+        ensureLocationPermissionIsGranted();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (grantResults.length < 2)
+        {
+            return;
+        }
+
+        if (requestCode == AppConfig.LOCATION_CODE)
+        {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED)
+            {
+                ensureNotificationsAreEnabled();
+            }
+            else
+            {
+                finish();
+            }
+        }
+    }
+
+    private void ensureLocationPermissionIsGranted()
+    {
+        if ((checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED)
+                && (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED))
+        {
+            requestPermissions(Arrays.asList(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION).toArray(new String[0]), AppConfig.LOCATION_CODE);
+        }
+        else
+        {
+            ensureNotificationsAreEnabled();
+        }
+    }
+
+    private void ensureNotificationsAreEnabled()
+    {
+        if (!initiated)
+        {
+            initiated = true;
+
+            return;
+        }
+
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) && (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED))
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("Notifications are disabled")
+                    .setMessage("This application requires sending notifications. Please enable them in settings.")
+                    .setPositiveButton("Settings", (dialog, which) ->
+                    {
+                        dialog.dismiss();
+
+                        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED)
+                        {
+                            Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                            intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                            startActivity(intent);
+                        }
+                        else
+                        {
+                            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                            {
+                                validateTokenAndSwitchActivity();
+                            }
+                            else
+                            {
+                                ensureGpsIsActive();
+                            }
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> finish());
+
+            alertDialogBuilder.create().show();
+        }
+        else
+        {
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            {
+                validateTokenAndSwitchActivity();
+            }
+            else
+            {
+                ensureGpsIsActive();
+            }
+        }
     }
 
     private void ensureGpsIsActive()

@@ -4,7 +4,6 @@ import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MS
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -29,6 +28,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.Arrays;
 
 import okhttp3.Call;
@@ -42,6 +42,7 @@ import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
 import pl.gruszm.zephyrwork.enums.RoleType;
 import pl.gruszm.zephyrwork.navigation.MyOnNavigationItemSelectedListener;
+import pl.gruszm.zephyrwork.services.AutoStartService;
 import pl.gruszm.zephyrwork.services.LocationSenderService;
 
 public class WorkSessionActivity extends AppCompatActivity
@@ -67,6 +68,7 @@ public class WorkSessionActivity extends AppCompatActivity
 
     // Other
     private String userRole;
+    private UserDTO userDTO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -186,6 +188,12 @@ public class WorkSessionActivity extends AppCompatActivity
                         navigationView.setNavigationItemSelectedListener(itemSelectedListener);
                     });
 
+                    if (userDTO.isForceStartWorkSession())
+                    {
+                        startService(new Intent(WorkSessionActivity.this, AutoStartService.class));
+                        WorkSessionActivity.this.userDTO = userDTO;
+                    }
+
                     response.close();
                 }
             }
@@ -196,6 +204,7 @@ public class WorkSessionActivity extends AppCompatActivity
     {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Intent intent = new Intent(this, LoginActivity.class);
+        stopService(new Intent(this, AutoStartService.class));
 
         editor.remove("Auth");
         editor.apply();
@@ -253,6 +262,19 @@ public class WorkSessionActivity extends AppCompatActivity
 
     private void startWorkSessionOnClickListener(View view)
     {
+        if (userDTO.isForceStartWorkSession())
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("You have required working hours")
+                    .setMessage("You cannot start the work session manually, because You have required working hours. Please contact Your supervisor for more information.\n" +
+                            "In case You cannot see the notification for auto-starting, restart the application.")
+                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+
+            alertDialogBuilder.create().show();
+
+            return;
+        }
+
         // Check permissions for location
         if ((checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED)
                 && (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED))
@@ -368,6 +390,24 @@ public class WorkSessionActivity extends AppCompatActivity
         if (callLock == true)
         {
             return;
+        }
+
+        if (userDTO.isForceStartWorkSession())
+        {
+            LocalTime endingHours = LocalTime.of(userDTO.getEndingHour(), userDTO.getEndingMinute());
+
+            if (LocalTime.now().isBefore(endingHours))
+            {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+                alertDialogBuilder
+                        .setTitle("You have required working hours")
+                        .setMessage("You cannot end the work session before the ending hour.\n" +
+                                "Please contact Your supervisor for more information.")
+                        .setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+
+                return;
+            }
         }
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(WorkSessionActivity.this);
