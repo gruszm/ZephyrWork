@@ -61,7 +61,6 @@ public class LocationSenderService extends Service implements LocationListener
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         createNotificationChannel();
-        startForeground(1, getNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
     }
 
     // Suppressed, because permission is checked in the method, which starts the service
@@ -74,6 +73,8 @@ public class LocationSenderService extends Service implements LocationListener
                 this,
                 Looper.getMainLooper()
         );
+
+        startForeground(1, getNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
 
         return START_STICKY;
     }
@@ -113,12 +114,15 @@ public class LocationSenderService extends Service implements LocationListener
         Intent notificationIntent = new Intent(this, WorkSessionActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("ZephyrWork")
                 .setContentText("Sending Your locations for the active work session")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .build();
+
+        return notification;
     }
 
     @Override

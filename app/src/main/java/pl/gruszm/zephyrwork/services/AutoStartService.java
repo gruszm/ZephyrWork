@@ -44,6 +44,7 @@ public class AutoStartService extends Service
     private Gson gson;
     private SharedPreferences sharedPreferences;
     private boolean callLock = false;
+    private static boolean isRunning = false;
 
     @Override
     public void onCreate()
@@ -145,7 +146,9 @@ public class AutoStartService extends Service
                     Intent locationSenderService = new Intent(AutoStartService.this, LocationSenderService.class);
                     locationSenderService.putExtra("interval", Integer.parseInt(response.body().string()));
 
-                    startService(locationSenderService);
+                    startForegroundService(locationSenderService);
+                    stopService(new Intent(AutoStartService.this, AutoStartService.class));
+                    AutoStartService.setRunning(false);
 
                     response.close();
                 }
@@ -158,6 +161,15 @@ public class AutoStartService extends Service
                 {
                     new Handler(Looper.getMainLooper()).post(
                             () -> Toast.makeText(AutoStartService.this, "You already have an active Work Session at the moment.", Toast.LENGTH_SHORT).show());
+
+                    Intent locationSenderService = new Intent(AutoStartService.this, LocationSenderService.class);
+                    locationSenderService.putExtra("interval", Integer.parseInt(response.body().string()));
+
+                    startForegroundService(locationSenderService);
+                    stopService(new Intent(AutoStartService.this, AutoStartService.class));
+                    AutoStartService.setRunning(false);
+
+                    response.close();
                 }
 
                 callLock = false;
@@ -178,21 +190,8 @@ public class AutoStartService extends Service
                 .setContentText("Work session will be automatically started.")
                 .setSmallIcon(R.drawable.round_work_24)
                 .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .build();
-
-//        if (isRunning)
-//        {
-//            stopForeground(STOP_FOREGROUND_REMOVE);
-//            startForeground(2, notification);
-//            handler.removeCallbacks(runnable);
-//            handler.post(runnable);
-//        }
-//        else
-//        {
-//            startForeground(2, notification);
-//            handler.post(runnable);
-//            isRunning = true;
-//        }
 
         startForeground(2, notification);
         handler.post(runnable);
@@ -227,5 +226,15 @@ public class AutoStartService extends Service
         {
             manager.createNotificationChannel(serviceChannel);
         }
+    }
+
+    public static boolean isRunning()
+    {
+        return isRunning;
+    }
+
+    public static void setRunning(boolean isRunning)
+    {
+        AutoStartService.isRunning = isRunning;
     }
 }

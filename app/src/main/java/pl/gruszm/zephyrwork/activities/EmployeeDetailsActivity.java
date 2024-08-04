@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -45,7 +46,7 @@ public class EmployeeDetailsActivity extends AppCompatActivity
     private UserDTO userDTO;
     private TextView email, firstNameAndLastName, role, startingHourTv, endingHourTv;
     private EditText intervalEt;
-    private ImageButton saveBtn;
+    private ImageButton saveBtn, deleteBtn;
     private SubordinateEmpDataDTO subordinateEmpDataDTO;
     private CheckBox forceStartWorkSessionCheckbox;
 
@@ -75,6 +76,7 @@ public class EmployeeDetailsActivity extends AppCompatActivity
         firstNameAndLastName = findViewById(R.id.employee_first_name_and_last_name);
         role = findViewById(R.id.employee_role);
         saveBtn = findViewById(R.id.save_interval_button);
+        deleteBtn = findViewById(R.id.delete_employee_button);
         intervalEt = findViewById(R.id.employee_location_registration_interval_et);
         startingHourTv = findViewById(R.id.starting_hour);
         endingHourTv = findViewById(R.id.ending_hour);
@@ -109,6 +111,7 @@ public class EmployeeDetailsActivity extends AppCompatActivity
         endingHourTv.setOnClickListener(this::endingHourOnClickListener);
         saveBtn.setOnClickListener(this::saveOnClickListener);
         saveBtn.setVisibility(View.GONE);
+        deleteBtn.setOnClickListener(this::deletePromptOnClickListener);
 
         forceStartWorkSessionCheckbox.setOnCheckedChangeListener((buttonView, isChecked) ->
         {
@@ -167,6 +170,57 @@ public class EmployeeDetailsActivity extends AppCompatActivity
         );
         toolbar.setNavigationOnClickListener(this::navigationOnClickListener);
         navigationView.setNavigationItemSelectedListener(itemSelectedListener);
+    }
+
+    private void deletePromptOnClickListener(View view)
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder.setTitle("Do You really want to delete this employee?")
+                .setMessage("You are about to delete this employee FOREVER.\n" +
+                        "After deleting, the employee's subordinates will be assigned to You.")
+                .setPositiveButton("YES", (dialog, which) ->
+                {
+                    dialog.dismiss();
+                    deleteEmployee();
+                })
+                .setNegativeButton("NO", (dialog, which) -> dialog.dismiss());
+
+        alertDialogBuilder.create().show();
+    }
+
+    private void deleteEmployee()
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Request request = new Request.Builder()
+                .delete()
+                .url(AppConfig.BACKEND_BASE + "/users/subordinates/" + userDTO.getId())
+                .header("Auth", sharedPreferences.getString("Auth", ""))
+                .build();
+        Call call = okHttpClient.newCall(request);
+
+        call.enqueue(new Callback()
+        {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e)
+            {
+
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException
+            {
+                if (response.isSuccessful())
+                {
+                    runOnUiThread(() -> EmployeeDetailsActivity.this.finish());
+                }
+                else
+                {
+                    runOnUiThread(() -> Toast.makeText(EmployeeDetailsActivity.this, "RESPONSE CODE: " + response.code(), Toast.LENGTH_SHORT).show());
+                }
+            }
+        });
     }
 
     private void navigationOnClickListener(View view)

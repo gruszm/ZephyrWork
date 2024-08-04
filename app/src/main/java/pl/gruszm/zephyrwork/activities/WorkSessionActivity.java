@@ -188,11 +188,13 @@ public class WorkSessionActivity extends AppCompatActivity
                         navigationView.setNavigationItemSelectedListener(itemSelectedListener);
                     });
 
-                    if (userDTO.isForceStartWorkSession())
+                    if (userDTO.isForceStartWorkSession() && !AutoStartService.isRunning())
                     {
-                        startService(new Intent(WorkSessionActivity.this, AutoStartService.class));
-                        WorkSessionActivity.this.userDTO = userDTO;
+                        startForegroundService(new Intent(WorkSessionActivity.this, AutoStartService.class));
+                        AutoStartService.setRunning(true);
                     }
+
+                    WorkSessionActivity.this.userDTO = userDTO;
 
                     response.close();
                 }
@@ -205,9 +207,12 @@ public class WorkSessionActivity extends AppCompatActivity
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Intent intent = new Intent(this, LoginActivity.class);
         stopService(new Intent(this, AutoStartService.class));
+        AutoStartService.setRunning(false);
 
         editor.remove("Auth");
         editor.apply();
+
+        stopService(new Intent(this, LocationSenderService.class));
 
         finish();
         startActivity(intent);
@@ -279,7 +284,19 @@ public class WorkSessionActivity extends AppCompatActivity
         if ((checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED)
                 && (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED))
         {
-            requestPermissions(Arrays.asList(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION).toArray(new String[0]), AppConfig.LOCATION_CODE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+            {
+                if (checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE_LOCATION) == PackageManager.PERMISSION_DENIED)
+                {
+                    requestPermissions(Arrays.asList(Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.FOREGROUND_SERVICE_LOCATION).toArray(new String[0]), AppConfig.LOCATION_CODE);
+                }
+            }
+            else
+            {
+                requestPermissions(Arrays.asList(Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION).toArray(new String[0]), AppConfig.LOCATION_CODE);
+            }
 
             return;
         }
@@ -346,7 +363,7 @@ public class WorkSessionActivity extends AppCompatActivity
                     Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
                     locationSenderService.putExtra("interval", Integer.parseInt(response.body().string()));
 
-                    startService(locationSenderService);
+                    startForegroundService(locationSenderService);
 
                     runOnUiThread(() ->
                     {
@@ -377,7 +394,13 @@ public class WorkSessionActivity extends AppCompatActivity
                 }
                 else if (response.code() == 400) // Bad Request, the user already has an active Work Session
                 {
-                    runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "You already have an active Work Session at the moment.", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "You already have an active Work Session at the moment.\n" +
+                            "Re-launching the location sender service...", Toast.LENGTH_SHORT).show());
+
+                    Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
+                    locationSenderService.putExtra("interval", Integer.parseInt(response.body().string()));
+
+                    startForegroundService(locationSenderService);
                 }
 
                 callLock = false;
@@ -394,9 +417,11 @@ public class WorkSessionActivity extends AppCompatActivity
 
         if (userDTO.isForceStartWorkSession())
         {
+            LocalTime startingHours = LocalTime.of(userDTO.getStartingHour(), userDTO.getStartingMinute());
             LocalTime endingHours = LocalTime.of(userDTO.getEndingHour(), userDTO.getEndingMinute());
+            LocalTime now = LocalTime.now();
 
-            if (LocalTime.now().isBefore(endingHours))
+            if (now.isAfter(startingHours) && now.isBefore(endingHours))
             {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
@@ -405,6 +430,8 @@ public class WorkSessionActivity extends AppCompatActivity
                         .setMessage("You cannot end the work session before the ending hour.\n" +
                                 "Please contact Your supervisor for more information.")
                         .setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+
+                alertDialogBuilder.create().show();
 
                 return;
             }

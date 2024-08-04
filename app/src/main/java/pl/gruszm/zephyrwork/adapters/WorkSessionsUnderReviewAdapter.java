@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,12 +85,12 @@ public class WorkSessionsUnderReviewAdapter extends RecyclerView.Adapter<WorkSes
     {
         WorkSessionDTO workSessionDTO = filteredWorkSessionDTOs.get(position);
 
-        String startTime = "Start: " + LocalDateTime.parse(workSessionDTO.getStartTime()).format(formatter).toString();
+        String startTime = "Start: " + LocalDateTime.parse(workSessionDTO.getStartTime()).plusHours(2).format(formatter);
         String endTime = "";
 
         if (workSessionDTO.getEndTime() != null)
         {
-            endTime = "End: " + LocalDateTime.parse(workSessionDTO.getEndTime()).format(formatter).toString();
+            endTime = "End: " + LocalDateTime.parse(workSessionDTO.getEndTime()).plusHours(2).format(formatter);
         }
 
         holder.setWorkSessionState(workSessionDTO.getWorkSessionState());
