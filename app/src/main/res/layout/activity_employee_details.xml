@@ -97,6 +97,14 @@
                 android:imeOptions="actionDone"
                 android:gravity="center" />
 
+            <TextView
+                android:text="seconds"
+                app:layout_constraintLeft_toRightOf="@id/employee_location_registration_interval_et"
+                app:layout_constraintTop_toTopOf="@id/employee_location_registration_interval"
+                app:layout_constraintBottom_toBottomOf="@id/employee_location_registration_interval"
+                style="@style/UserProfileStylePrimary"
+                android:layout_marginTop="0dp" />
+
             <CheckBox
                 android:id="@+id/force_start_work_session_checkbox"
                 android:layout_width="wrap_content"
