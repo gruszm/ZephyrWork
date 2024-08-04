@@ -103,7 +103,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
             activity.startActivity(intent);
         });
 
-        if (isUnderReviewActivity)
+        if (isUnderReviewActivity && workSessionState.equals(WorkSessionState.UNDER_REVIEW))
         {
             alertDialogBuilder.setNegativeButton("RETURN", (DialogInterface dialog, int var2) ->
             {
@@ -115,7 +115,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
                 approveWorkSession(dialog);
             });
         }
-        else if (workSessionState.equals(WorkSessionState.RETURNED))
+        else if (!isUnderReviewActivity && workSessionState.equals(WorkSessionState.RETURNED))
         {
             alertDialogBuilder.setPositiveButton("RE-SEND", (dialogInterface, i) ->
             {
@@ -128,7 +128,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
                 cancelWorkSession();
             });
         }
-        else if (workSessionState.equals(WorkSessionState.IN_PROGRESS) || workSessionState.equals(WorkSessionState.UNDER_REVIEW))
+        else if (!isUnderReviewActivity && (workSessionState.equals(WorkSessionState.IN_PROGRESS) || workSessionState.equals(WorkSessionState.UNDER_REVIEW)))
         {
             alertDialogBuilder.setPositiveButton("CANCEL", (dialogInterface, i) ->
             {
@@ -378,7 +378,8 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
                 if (response.isSuccessful())
                 {
                     activity.runOnUiThread(() -> Toast.makeText(activity, "Work session returned.", Toast.LENGTH_SHORT).show());
-                    onWorkSessionUpdateCallback.removeWorkSession(workSessionId);
+                    onWorkSessionUpdateCallback.updateWorkSessionState(workSessionId, WorkSessionState.RETURNED);
+                    onWorkSessionUpdateCallback.updateNotesFromSupervisor(workSessionId, reason);
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {
@@ -440,7 +441,7 @@ public class WorkSessionViewHolder extends RecyclerView.ViewHolder
                 {
                     activity.runOnUiThread(() -> Toast.makeText(activity, "Work session approved successfully.", Toast.LENGTH_SHORT).show());
                     dialogInterface.dismiss();
-                    onWorkSessionUpdateCallback.removeWorkSession(workSessionId);
+                    onWorkSessionUpdateCallback.updateWorkSessionState(workSessionId, WorkSessionState.APPROVED);
                 }
                 else if (response.code() == 401) // Unauthorized, the token is invalid or missing
                 {

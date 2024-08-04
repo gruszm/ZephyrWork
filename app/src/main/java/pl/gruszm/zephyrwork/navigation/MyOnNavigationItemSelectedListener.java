@@ -39,9 +39,10 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
     {
+        String activityClassName = activity.getClass().getName();
         int id = menuItem.getItemId();
 
-        if (id == R.id.my_work_sessions)
+        if ((id == R.id.my_work_sessions) && (!activityClassName.equals(MyWorkSessionsActivity.class.getName())))
         {
             Intent intent = new Intent(activity, MyWorkSessionsActivity.class);
             intent.putExtra("user_role", userRole);
@@ -60,7 +61,7 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
                 alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
                 alertDialogBuilder.create().show();
             }
-            else
+            else if (!activityClassName.equals(WorkSessionsUnderReviewActivity.class.getName()))
             {
                 Intent intent = new Intent(activity, WorkSessionsUnderReviewActivity.class);
                 intent.putExtra("user_role", userRole);
@@ -80,7 +81,7 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
                 alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
                 alertDialogBuilder.create().show();
             }
-            else
+            else if (!activityClassName.equals(RegisterNewEmployeeActivity.class.getName()))
             {
                 Intent intent = new Intent(activity, RegisterNewEmployeeActivity.class);
                 intent.putExtra("user_role", userRole);
@@ -92,11 +93,25 @@ public class MyOnNavigationItemSelectedListener implements NavigationView.OnNavi
         }
         else if (id == R.id.my_subordinates)
         {
-            Intent intent = new Intent(activity, SubordinatesListActivity.class);
+            if (userRole.equals(RoleType.EMPLOYEE.name()))
+            {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+                alertDialogBuilder.setTitle("ERROR");
+                alertDialogBuilder.setMessage("This action is not available for regular employees.");
+                alertDialogBuilder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
+                alertDialogBuilder.create().show();
+            }
+            else if (!activityClassName.equals(SubordinatesListActivity.class.getName()))
+            {
+                Intent intent = new Intent(activity, SubordinatesListActivity.class);
+                intent.putExtra("user_role", userRole);
+                intent.putExtra("nav_first_and_last_name", firstNameAndLastName);
+                intent.putExtra("email", email);
 
-            activity.startActivity(intent);
+                activity.startActivity(intent);
+            }
         }
-        else if (id == R.id.home)
+        else if ((id == R.id.home) && (!activityClassName.equals(WorkSessionActivity.class.getName())))
         {
             Intent intent = new Intent(activity, WorkSessionActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

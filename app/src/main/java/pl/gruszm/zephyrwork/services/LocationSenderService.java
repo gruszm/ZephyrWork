@@ -49,6 +49,7 @@ public class LocationSenderService extends Service implements LocationListener
     private Gson gson;
     private SharedPreferences sharedPreferences;
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private static boolean isRunning;
 
     @Override
     public void onCreate()
@@ -61,7 +62,6 @@ public class LocationSenderService extends Service implements LocationListener
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         createNotificationChannel();
-        startForeground(1, getNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
     }
 
     // Suppressed, because permission is checked in the method, which starts the service
@@ -75,6 +75,10 @@ public class LocationSenderService extends Service implements LocationListener
                 Looper.getMainLooper()
         );
 
+        startForeground(1, getNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+
+        AutoStartService.setRunning(true);
+
         return START_STICKY;
     }
 
@@ -82,6 +86,7 @@ public class LocationSenderService extends Service implements LocationListener
     public void onDestroy()
     {
         super.onDestroy();
+        AutoStartService.setRunning(false);
         fusedLocationProviderClient.removeLocationUpdates(this);
     }
 
@@ -113,12 +118,15 @@ public class LocationSenderService extends Service implements LocationListener
         Intent notificationIntent = new Intent(this, WorkSessionActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("ZephyrWork")
                 .setContentText("Sending Your locations for the active work session")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .build();
+
+        return notification;
     }
 
     @Override
@@ -168,5 +176,15 @@ public class LocationSenderService extends Service implements LocationListener
     private void showToast(String message)
     {
         new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(LocationSenderService.this, message, Toast.LENGTH_SHORT).show());
+    }
+
+    public static boolean isRunning()
+    {
+        return isRunning;
+    }
+
+    public static void setRunning(boolean isRunning)
+    {
+        LocationSenderService.isRunning = isRunning;
     }
 }

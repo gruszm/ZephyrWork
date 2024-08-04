@@ -2,15 +2,23 @@ package pl.gruszm.zephyrwork.activities;
 
 import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
@@ -33,6 +41,8 @@ public class LoginActivity extends AppCompatActivity
     private boolean callLock;
     private EditText email, password;
     private ImageButton submitButton;
+    private static int timeoutCounter = 0;
+    private boolean initiated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -48,7 +58,132 @@ public class LoginActivity extends AppCompatActivity
 
         submitButton.setOnClickListener(this::submitOnClickListener);
 
-        validateTokenAndSwitchActivity();
+        ensureAllLocationPermissionsAreGranted();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        if (initiated)
+        {
+            ensureAllLocationPermissionsAreGranted();
+        }
+        else
+        {
+            initiated = true;
+        }
+    }
+
+    private void ensureAllLocationPermissionsAreGranted()
+    {
+        if ((checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED
+                && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED)
+                || checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_DENIED)
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("Location permissions not granted")
+                    .setMessage("This application requires all location permissions. Please enable them in settings.")
+                    .setPositiveButton("Proceed", (dialog, which) ->
+                    {
+                        dialog.dismiss();
+
+                        if ((checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED
+                                && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED)
+                                || checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_DENIED)
+                        {
+                            startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(Uri.fromParts("package", getPackageName(), null)));
+                        }
+                        else
+                        {
+                            ensureNotificationsAreEnabled();
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> finish());
+
+            alertDialogBuilder.create().show();
+        }
+        else
+        {
+            ensureNotificationsAreEnabled();
+        }
+    }
+
+    private void ensureNotificationsAreEnabled()
+    {
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) && (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED))
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("Notifications are disabled")
+                    .setMessage("This application requires sending notifications. Please enable them in settings.")
+                    .setPositiveButton("Proceed", (dialog, which) ->
+                    {
+                        dialog.dismiss();
+
+                        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED)
+                        {
+                            Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                            intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                            startActivity(intent);
+                        }
+                        else
+                        {
+                            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                            {
+                                validateTokenAndSwitchActivity();
+                            }
+                            else
+                            {
+                                ensureGpsIsActive();
+                            }
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> finish());
+
+            alertDialogBuilder.create().show();
+        }
+        else
+        {
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            {
+                validateTokenAndSwitchActivity();
+            }
+            else
+            {
+                ensureGpsIsActive();
+            }
+        }
+    }
+
+    private void ensureGpsIsActive()
+    {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("GPS provider is disabled")
+                    .setMessage("This application requires an active GPS provider. Please enable GPS in settings.")
+                    .setPositiveButton("Proceed", (dialog, which) ->
+                    {
+                        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                        {
+                            dialog.dismiss();
+                            validateTokenAndSwitchActivity();
+                        }
+                        else
+                        {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> finish());
+
+            alertDialogBuilder.create().show();
+        }
     }
 
     private void validateTokenAndSwitchActivity()
