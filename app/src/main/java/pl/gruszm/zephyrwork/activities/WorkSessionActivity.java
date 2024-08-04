@@ -71,6 +71,17 @@ public class WorkSessionActivity extends AppCompatActivity
     private UserDTO userDTO;
 
     @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        if (sharedPreferences.getString("Auth", "").isEmpty())
+        {
+            finish();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -188,7 +199,7 @@ public class WorkSessionActivity extends AppCompatActivity
                         navigationView.setNavigationItemSelectedListener(itemSelectedListener);
                     });
 
-                    if (userDTO.isForceStartWorkSession() && !AutoStartService.isRunning())
+                    if (userDTO.isForceStartWorkSession() && !AutoStartService.isRunning() && !LocationSenderService.isRunning())
                     {
                         startForegroundService(new Intent(WorkSessionActivity.this, AutoStartService.class));
                         AutoStartService.setRunning(true);
@@ -205,15 +216,14 @@ public class WorkSessionActivity extends AppCompatActivity
     private void logoutOnClickListener(View view)
     {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        Intent intent = new Intent(this, LoginActivity.class);
         stopService(new Intent(this, AutoStartService.class));
+        stopService(new Intent(this, LocationSenderService.class));
         AutoStartService.setRunning(false);
 
         editor.remove("Auth");
         editor.apply();
 
-        stopService(new Intent(this, LocationSenderService.class));
-
+        Intent intent = new Intent(this, LoginActivity.class);
         finish();
         startActivity(intent);
     }
@@ -468,6 +478,8 @@ public class WorkSessionActivity extends AppCompatActivity
                     Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
 
                     stopService(locationSenderService);
+                    startForegroundService(new Intent(WorkSessionActivity.this, AutoStartService.class));
+                    AutoStartService.setRunning(true);
 
                     runOnUiThread(() ->
                     {

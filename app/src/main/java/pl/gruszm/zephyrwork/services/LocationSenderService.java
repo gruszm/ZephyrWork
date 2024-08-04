@@ -49,6 +49,7 @@ public class LocationSenderService extends Service implements LocationListener
     private Gson gson;
     private SharedPreferences sharedPreferences;
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private static boolean isRunning;
 
     @Override
     public void onCreate()
@@ -76,6 +77,8 @@ public class LocationSenderService extends Service implements LocationListener
 
         startForeground(1, getNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
 
+        AutoStartService.setRunning(true);
+
         return START_STICKY;
     }
 
@@ -83,6 +86,7 @@ public class LocationSenderService extends Service implements LocationListener
     public void onDestroy()
     {
         super.onDestroy();
+        AutoStartService.setRunning(false);
         fusedLocationProviderClient.removeLocationUpdates(this);
     }
 
@@ -172,5 +176,15 @@ public class LocationSenderService extends Service implements LocationListener
     private void showToast(String message)
     {
         new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(LocationSenderService.this, message, Toast.LENGTH_SHORT).show());
+    }
+
+    public static boolean isRunning()
+    {
+        return isRunning;
+    }
+
+    public static void setRunning(boolean isRunning)
+    {
+        LocationSenderService.isRunning = isRunning;
     }
 }
