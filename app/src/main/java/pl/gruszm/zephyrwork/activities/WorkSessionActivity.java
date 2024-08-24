@@ -3,10 +3,14 @@ package pl.gruszm.zephyrwork.activities;
 import static pl.gruszm.zephyrwork.config.AppConfig.CONNECTION_ERROR_STANDARD_MSG;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -24,6 +28,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.Arrays;
 
 import okhttp3.Call;
@@ -35,7 +40,9 @@ import okhttp3.Response;
 import pl.gruszm.zephyrwork.DTOs.UserDTO;
 import pl.gruszm.zephyrwork.R;
 import pl.gruszm.zephyrwork.config.AppConfig;
+import pl.gruszm.zephyrwork.enums.RoleType;
 import pl.gruszm.zephyrwork.navigation.MyOnNavigationItemSelectedListener;
+import pl.gruszm.zephyrwork.services.AutoStartService;
 import pl.gruszm.zephyrwork.services.LocationSenderService;
 
 public class WorkSessionActivity extends AppCompatActivity
@@ -45,6 +52,7 @@ public class WorkSessionActivity extends AppCompatActivity
     private Gson gson;
     private SharedPreferences sharedPreferences;
     private boolean callLock;
+    private boolean ceoAgreed;
 
     // Buttons
     private ImageButton startWorkSessionBtn, finishWorkSessionBtn, userProfileBtn, logoutBtn;
@@ -60,6 +68,18 @@ public class WorkSessionActivity extends AppCompatActivity
 
     // Other
     private String userRole;
+    private UserDTO userDTO;
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        if (sharedPreferences.getString("Auth", "").isEmpty())
+        {
+            finish();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -72,6 +92,7 @@ public class WorkSessionActivity extends AppCompatActivity
         gson = new Gson();
         sharedPreferences = getSharedPreferences(AppConfig.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
         callLock = false;
+        ceoAgreed = false;
 
         // Layout
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -178,6 +199,14 @@ public class WorkSessionActivity extends AppCompatActivity
                         navigationView.setNavigationItemSelectedListener(itemSelectedListener);
                     });
 
+                    if (userDTO.isForceStartWorkSession() && !AutoStartService.isRunning() && !LocationSenderService.isRunning())
+                    {
+                        startForegroundService(new Intent(WorkSessionActivity.this, AutoStartService.class));
+                        AutoStartService.setRunning(true);
+                    }
+
+                    WorkSessionActivity.this.userDTO = userDTO;
+
                     response.close();
                 }
             }
@@ -187,28 +216,129 @@ public class WorkSessionActivity extends AppCompatActivity
     private void logoutOnClickListener(View view)
     {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        Intent intent = new Intent(this, LoginActivity.class);
+        stopService(new Intent(this, AutoStartService.class));
+        stopService(new Intent(this, LocationSenderService.class));
+        AutoStartService.setRunning(false);
 
         editor.remove("Auth");
         editor.apply();
 
+        Intent intent = new Intent(this, LoginActivity.class);
         finish();
         startActivity(intent);
     }
 
+    private boolean ensureGpsIsActive()
+    {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("GPS provider is disabled")
+                    .setMessage("This application requires an active GPS provider. Please enable GPS in settings.")
+                    .setPositiveButton("Settings", (dialog, which) ->
+                    {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+            alertDialogBuilder.create().show();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean ensureNotificationsAreEnabled()
+    {
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) && (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED))
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("Notifications are disabled")
+                    .setMessage("This application requires sending notifications. Please enable them in settings.")
+                    .setPositiveButton("Settings", (dialog, which) ->
+                    {
+                        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                        intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+            alertDialogBuilder.create().show();
+
+            return false;
+        }
+
+        return true;
+    }
+
     private void startWorkSessionOnClickListener(View view)
     {
-        // Check permissions for location
-        if ((checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED)
-                && (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED))
+        if (userDTO.isForceStartWorkSession())
         {
-            requestPermissions(Arrays.asList(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION).toArray(new String[0]), AppConfig.LOCATION_CODE);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                    .setTitle("You have required working hours")
+                    .setMessage("You cannot start the work session manually, because You have required working hours. Please contact Your supervisor for more information.\n" +
+                            "In case You cannot see the notification for auto-starting, restart the application.")
+                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+
+            alertDialogBuilder.create().show();
 
             return;
         }
 
-        if (callLock == true)
+        // Check permissions for location
+        if ((checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED)
+                && (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED))
         {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+            {
+                if (checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE_LOCATION) == PackageManager.PERMISSION_DENIED)
+                {
+                    requestPermissions(Arrays.asList(Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.FOREGROUND_SERVICE_LOCATION).toArray(new String[0]), AppConfig.LOCATION_CODE);
+                }
+            }
+            else
+            {
+                requestPermissions(Arrays.asList(Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION).toArray(new String[0]), AppConfig.LOCATION_CODE);
+            }
+
+            return;
+        }
+
+        // Check permissions for notifications for Android 13 and newer
+        if (!ensureNotificationsAreEnabled())
+        {
+            return;
+        }
+
+        if ((!ensureGpsIsActive()) || callLock)
+        {
+            return;
+        }
+
+        if (userRole.equals(RoleType.CEO.name()) && !ceoAgreed)
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+            alertDialogBuilder.setTitle("You are the CEO!");
+            alertDialogBuilder.setMessage("Starting a work session will have no effect, since You are the CEO. Do you wish to start it anyway?");
+            alertDialogBuilder.setNegativeButton("NO", (dialog, which) -> dialog.dismiss());
+            alertDialogBuilder.setPositiveButton("YES", ((dialog, which) ->
+            {
+                ceoAgreed = true;
+
+                dialog.dismiss();
+                startWorkSessionOnClickListener(view);
+            }));
+
+            alertDialogBuilder.show();
+
             return;
         }
 
@@ -243,7 +373,7 @@ public class WorkSessionActivity extends AppCompatActivity
                     Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
                     locationSenderService.putExtra("interval", Integer.parseInt(response.body().string()));
 
-                    startService(locationSenderService);
+                    startForegroundService(locationSenderService);
 
                     runOnUiThread(() ->
                     {
@@ -274,7 +404,13 @@ public class WorkSessionActivity extends AppCompatActivity
                 }
                 else if (response.code() == 400) // Bad Request, the user already has an active Work Session
                 {
-                    runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "You already have an active Work Session at the moment.", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(WorkSessionActivity.this, "You already have an active Work Session at the moment.\n" +
+                            "Re-launching the location sender service...", Toast.LENGTH_SHORT).show());
+
+                    Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
+                    locationSenderService.putExtra("interval", Integer.parseInt(response.body().string()));
+
+                    startForegroundService(locationSenderService);
                 }
 
                 callLock = false;
@@ -287,6 +423,28 @@ public class WorkSessionActivity extends AppCompatActivity
         if (callLock == true)
         {
             return;
+        }
+
+        if (userDTO.isForceStartWorkSession())
+        {
+            LocalTime startingHours = LocalTime.of(userDTO.getStartingHour(), userDTO.getStartingMinute());
+            LocalTime endingHours = LocalTime.of(userDTO.getEndingHour(), userDTO.getEndingMinute());
+            LocalTime now = LocalTime.now();
+
+            if (now.isAfter(startingHours) && now.isBefore(endingHours))
+            {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+                alertDialogBuilder
+                        .setTitle("You have required working hours")
+                        .setMessage("You cannot end the work session before the ending hour.\n" +
+                                "Please contact Your supervisor for more information.")
+                        .setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+
+                alertDialogBuilder.create().show();
+
+                return;
+            }
         }
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(WorkSessionActivity.this);
@@ -320,6 +478,8 @@ public class WorkSessionActivity extends AppCompatActivity
                     Intent locationSenderService = new Intent(WorkSessionActivity.this, LocationSenderService.class);
 
                     stopService(locationSenderService);
+                    startForegroundService(new Intent(WorkSessionActivity.this, AutoStartService.class));
+                    AutoStartService.setRunning(true);
 
                     runOnUiThread(() ->
                     {

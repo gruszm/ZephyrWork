@@ -47,18 +47,18 @@
                     android:padding="4dp" />
 
                 <TextView
-                    android:id="@+id/user_profile_first_name"
+                    android:id="@+id/personal_details"
                     android:text="First name:"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/profile_icon"
                     android:layout_marginTop="10dp"
-                    android:layout_marginLeft="50dp"
+                    android:layout_marginLeft="25dp"
                     style="@style/UserProfileStylePrimary" />
 
                 <TextView
                     android:id="@+id/user_profile_first_name_edit"
-                    app:layout_constraintLeft_toLeftOf="@id/user_profile_first_name"
-                    app:layout_constraintTop_toBottomOf="@id/user_profile_first_name"
+                    app:layout_constraintLeft_toLeftOf="@id/personal_details"
+                    app:layout_constraintTop_toBottomOf="@id/personal_details"
                     style="@style/UserProfileStyleSecondary" />
 
                 <TextView
